@@ -92,7 +92,10 @@ print("✓ GPU Hardware Status:", json.dumps(get_gpu_vram_usage_mb(), indent=2))
 Installs `laya[serve]`, `typesafe-sdk`, `bitsandbytes`, `peft`, `accelerate`, and clones `jaredpalmer/kev` (without downgrading Kaggle's pre-installed PyTorch)."""
         ),
         make_code_cell(
-            """# Install packages without touching Kaggle's pre-installed torch/cuda
+            """# Remove Kaggle's incompatible pre-installed torchao 0.10.0 so peft loads cleanly
+!pip uninstall -y -q torchao
+
+# Install packages without touching Kaggle's pre-installed torch/cuda
 !pip install -q --no-warn-script-location \\
     "laya[serve]>=0.1.0" \\
     "typesafe-sdk>=0.1.0" \\
@@ -260,71 +263,74 @@ for m_key in CANDIDATE_MODELS:
     print("\\n" + "=" * 70)
     print(f"🚀 BENCHMARKING CANDIDATE MODEL: {m_key}")
     print("=" * 70)
-    proc, selector = start_model_server(m_key)
+    try:
+        proc, selector = start_model_server(m_key)
 
-    # 1. Warm up GPU kernels with 3 untimed calls
-    for _ in range(3):
-        selector.select_policy(sample_summaries[0])
+        # 1. Warm up GPU kernels with 3 untimed calls
+        for _ in range(3):
+            selector.select_policy(sample_summaries[0])
 
-    vram_info = get_gpu_vram_usage_mb()
-    gpu0_vram_mb = vram_info["gpus"][0]["memory_used_mb"] if vram_info.get("gpus") else 0.0
+        vram_info = get_gpu_vram_usage_mb()
+        gpu0_vram_mb = vram_info["gpus"][0]["memory_used_mb"] if vram_info.get("gpus") else 0.0
 
-    # 2. 50-Call NDT Decision Speed Benchmark
-    bench_latencies = []
-    valid_count = 0
-    fixed_picks = 0
-    ca_picks = 0
-    for i in range(50):
-        s_in = sample_summaries[i % 2]
-        res = selector.select_policy(s_in)
-        bench_latencies.append(res.decision_latency_ms)
-        if res.is_valid:
-            valid_count += 1
-            if res.selected_policy == "fixed":
-                fixed_picks += 1
-            elif res.selected_policy == "change-aware":
-                ca_picks += 1
+        # 2. 50-Call NDT Decision Speed Benchmark
+        bench_latencies = []
+        valid_count = 0
+        fixed_picks = 0
+        ca_picks = 0
+        for i in range(50):
+            s_in = sample_summaries[i % 2]
+            res = selector.select_policy(s_in)
+            bench_latencies.append(res.decision_latency_ms)
+            if res.is_valid:
+                valid_count += 1
+                if res.selected_policy == "fixed":
+                    fixed_picks += 1
+                elif res.selected_policy == "change-aware":
+                    ca_picks += 1
 
-    lat_arr = np.array(bench_latencies)
+        lat_arr = np.array(bench_latencies)
 
-    # 3. Run full 24-trace Pilot Simulation for this model
-    print(f"[{m_key}] Running 24 Pilot NDT trace simulations...")
-    t_sim_start = time.perf_counter()
-    m_pilot_df, _ = run_model_controller_on_split(
-        traces_dir="traces",
-        split="pilot",
-        model_name=m_key,
-        model_selector_fn=selector.select_policy,
-        output_dir="logs/pilot_runs",
-        protocol=DEFAULT_PROTOCOL,
-        run_repeat_stability=False,
-    )
-    sim_wall_s = time.perf_counter() - t_sim_start
-    pilot_model_dfs.append(m_pilot_df)
+        # 3. Run full 24-trace Pilot Simulation for this model
+        print(f"[{m_key}] Running 24 Pilot NDT trace simulations...")
+        t_sim_start = time.perf_counter()
+        m_pilot_df, _ = run_model_controller_on_split(
+            traces_dir="traces",
+            split="pilot",
+            model_name=m_key,
+            model_selector_fn=selector.select_policy,
+            output_dir="logs/pilot_runs",
+            protocol=DEFAULT_PROTOCOL,
+            run_repeat_stability=False,
+        )
+        sim_wall_s = time.perf_counter() - t_sim_start
+        pilot_model_dfs.append(m_pilot_df)
 
-    row = {
-        "model_key": m_key,
-        "hf_repo": DEFAULT_PROTOCOL.candidate_models[m_key]["hf_repo"],
-        "revision": DEFAULT_PROTOCOL.candidate_models[m_key]["revision"][:10],
-        "precision_t4": DEFAULT_PROTOCOL.candidate_models[m_key]["precision_t4"],
-        "gpu_vram_mb": round(gpu0_vram_mb, 1),
-        "bench50_mean_ms": round(float(np.mean(lat_arr)), 2),
-        "bench50_p50_ms": round(float(np.median(lat_arr)), 2),
-        "bench50_p95_ms": round(float(np.percentile(lat_arr, 95)), 2),
-        "bench50_p99_ms": round(float(np.percentile(lat_arr, 99)), 2),
-        "parse_valid_rate": round(valid_count / 50.0, 4),
-        "pilot_mae_mean_pct": round(float(m_pilot_df["mae_pct_points"].mean()), 4),
-        "pilot_monitoring_bytes_mean": round(float(m_pilot_df["monitoring_bytes_total"].mean()), 1),
-        "pilot_fallback_rate": round(float(m_pilot_df["fallback_rate"].mean()), 4),
-        "pilot_fixed_fraction": round(float(m_pilot_df["fixed_policy_fraction"].mean()), 3),
-        "pilot_change_aware_fraction": round(float(m_pilot_df["change_aware_policy_fraction"].mean()), 3),
-        "pilot_24traces_runtime_s": round(sim_wall_s, 2),
-        "meets_deadline_2000ms": bool(np.percentile(lat_arr, 95) < DEFAULT_PROTOCOL.decision_deadline_ms),
-    }
-    pilot_screen_rows.append(row)
-    print(f"✓ [{m_key}] Pilot Summary:", json.dumps(row, indent=2))
-
-    kill_existing_model_servers()
+        row = {
+            "model_key": m_key,
+            "hf_repo": DEFAULT_PROTOCOL.candidate_models[m_key]["hf_repo"],
+            "revision": DEFAULT_PROTOCOL.candidate_models[m_key]["revision"][:10],
+            "precision_t4": DEFAULT_PROTOCOL.candidate_models[m_key]["precision_t4"],
+            "gpu_vram_mb": round(gpu0_vram_mb, 1),
+            "bench50_mean_ms": round(float(np.mean(lat_arr)), 2),
+            "bench50_p50_ms": round(float(np.median(lat_arr)), 2),
+            "bench50_p95_ms": round(float(np.percentile(lat_arr, 95)), 2),
+            "bench50_p99_ms": round(float(np.percentile(lat_arr, 99)), 2),
+            "parse_valid_rate": round(valid_count / 50.0, 4),
+            "pilot_mae_mean_pct": round(float(m_pilot_df["mae_pct_points"].mean()), 4),
+            "pilot_monitoring_bytes_mean": round(float(m_pilot_df["monitoring_bytes_total"].mean()), 1),
+            "pilot_fallback_rate": round(float(m_pilot_df["fallback_rate"].mean()), 4),
+            "pilot_fixed_fraction": round(float(m_pilot_df["fixed_policy_fraction"].mean()), 3),
+            "pilot_change_aware_fraction": round(float(m_pilot_df["change_aware_policy_fraction"].mean()), 3),
+            "pilot_24traces_runtime_s": round(sim_wall_s, 2),
+            "meets_deadline_2000ms": bool(np.percentile(lat_arr, 95) < DEFAULT_PROTOCOL.decision_deadline_ms),
+        }
+        pilot_screen_rows.append(row)
+        print(f"✓ [{m_key}] Pilot Summary:", json.dumps(row, indent=2))
+    except Exception as ex:
+        print(f"⚠ [{m_key}] Failed during Pilot benchmark: {ex}")
+    finally:
+        kill_existing_model_servers()
 
 pilot_screen_df = pd.DataFrame(pilot_screen_rows)
 pilot_screen_df.to_csv("logs/pilot_feasibility_screen_summary.csv", index=False)
@@ -364,26 +370,29 @@ for m_key in CANDIDATE_MODELS:
     print("\\n" + "=" * 70)
     print(f"🔬 RUNNING HELD-OUT MAIN EXPERIMENT (96 TRACES + REPEATS) FOR: {m_key}")
     print("=" * 70)
-    proc, selector = start_model_server(m_key)
+    try:
+        proc, selector = start_model_server(m_key)
 
-    # Warm-up
-    for _ in range(2):
-        selector.select_policy(sample_summaries[0])
+        # Warm-up
+        for _ in range(2):
+            selector.select_policy(sample_summaries[0])
 
-    m_heldout_df, m_rep_df = run_model_controller_on_split(
-        traces_dir="traces",
-        split="heldout",
-        model_name=m_key,
-        model_selector_fn=selector.select_policy,
-        output_dir="logs/heldout_runs",
-        protocol=DEFAULT_PROTOCOL,
-        run_repeat_stability=True,
-    )
-    heldout_model_dfs.append(m_heldout_df)
-    if m_rep_df is not None:
-        repeat_stability_dfs.append(m_rep_df)
-
-    kill_existing_model_servers()
+        m_heldout_df, m_rep_df = run_model_controller_on_split(
+            traces_dir="traces",
+            split="heldout",
+            model_name=m_key,
+            model_selector_fn=selector.select_policy,
+            output_dir="logs/heldout_runs",
+            protocol=DEFAULT_PROTOCOL,
+            run_repeat_stability=True,
+        )
+        heldout_model_dfs.append(m_heldout_df)
+        if m_rep_df is not None:
+            repeat_stability_dfs.append(m_rep_df)
+    except Exception as ex:
+        print(f"⚠ [{m_key}] Failed during Held-Out evaluation: {ex}")
+    finally:
+        kill_existing_model_servers()
 
 # Combine Baselines + All 3 Models into Master Held-Out Summary & Paired CI Tables
 all_heldout_df = pd.concat([heldout_baselines_df] + heldout_model_dfs, ignore_index=True)
@@ -458,3 +467,4 @@ if __name__ == "__main__":
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(nb, f, indent=2, ensure_ascii=False)
     print(f"✓ Generated {out_path}")
+

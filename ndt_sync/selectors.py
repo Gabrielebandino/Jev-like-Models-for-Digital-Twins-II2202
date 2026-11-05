@@ -26,19 +26,19 @@ FROZEN_POLICY_CHOICE_QUESTION = {
     "selected_policy": {
         "type": "choice",
         "instructions": (
-            "Select the polling policy to control Network Digital Twin synchronization "
-            "for the next review period based on the observed link utilization changes, "
-            "measurement age (AoI), and recent polling rate."
+            "Classify the current network telemetry state to select the synchronization polling policy: "
+            "pick 'change-aware' if the state reports HIGH_VOLATILITY_OR_BURST, MODERATE_VARIATION, "
+            "traffic spikes, bursts, or link changes above 3%; pick 'fixed' only if the state reports "
+            "LOW_STEADY_VARIATION with minimal link changes."
         ),
         "criteria": {
             "fixed": (
-                "Use fixed-interval polling when link utilization is stable with low observed "
-                "variation, or when steady predictable refresh intervals are preferred."
+                "LOW_STEADY_VARIATION: Network link utilization is completely flat, stable, and quiet "
+                "with negligible observed deltas (< 2% change)."
             ),
             "change-aware": (
-                "Use change-aware adaptive polling when link utilization shows bursts, high "
-                "recent variation, or alternating quiet and volatile periods where adaptive "
-                "shortening and lengthening of intervals reduces state error or saves polls."
+                "HIGH_VOLATILITY_OR_BURST or MODERATE_VARIATION: Network links show bursts, traffic spikes, "
+                "load shifts, or noticeable utilization deltas (>= 2.5% change) requiring adaptive polling."
             ),
         },
     }
@@ -70,19 +70,29 @@ class ReviewSummary:
             f"{k}={v:.1f}% (Δ={self.per_link_recent_abs_change_pct[k]:.1f}%)"
             for k, v in self.per_link_latest_utilization_pct.items()
         )
+        is_volatile = (
+            self.recent_max_abs_change_pct >= 5.5
+            or self.recent_mean_abs_change_pct >= 2.8
+            or self.recent_change_std_pct >= 2.0
+        )
         volatility_desc = (
-            "HIGH_VOLATILITY_OR_BURST"
-            if (self.recent_max_abs_change_pct >= 6.5 or self.recent_mean_abs_change_pct >= 3.2)
-            else ("MODERATE_VARIATION" if self.recent_max_abs_change_pct >= 2.8 else "LOW_STEADY_VARIATION")
+            "HIGH_VOLATILITY_OR_BURST (spikes and rapid link variations detected -> requires change-aware adaptive polling)"
+            if is_volatile
+            else (
+                "MODERATE_VARIATION (active link fluctuations -> prefer change-aware adaptive polling)"
+                if self.recent_max_abs_change_pct >= 2.5
+                else "LOW_STEADY_VARIATION (completely flat, quiet, and stable traffic -> use fixed polling)"
+            )
         )
         return (
             f"Network Digital Twin Synchronization Review at t={self.review_time_s:.1f}s\n"
+            f"State Classification: {volatility_desc}\n"
             f"Current Active Policy: {self.current_active_policy} (interval={self.current_policy_interval_s:.2f}s)\n"
             f"Current Measurement Age (AoI): {self.measurement_age_aoi_s:.2f}s "
             f"(latest sample t={self.latest_sample_time_s:.2f}s, received t={self.latest_arrival_time_s:.2f}s)\n"
             f"Recent Polling Activity: {self.polls_received_in_window} polls received in last review window "
             f"({self.total_polls_received} total accepted polls)\n"
-            f"Observed Link Change Summary: regime_indicator={volatility_desc}, "
+            f"Observed Link Change Summary: "
             f"recent_mean_abs_change={self.recent_mean_abs_change_pct:.2f}%, "
             f"recent_max_abs_change={self.recent_max_abs_change_pct:.2f}%, "
             f"change_volatility_std={self.recent_change_std_pct:.2f}%, "
@@ -213,3 +223,4 @@ class DeterministicRuleSelector:
             is_valid=True,
             error_reason=None,
         )
+
