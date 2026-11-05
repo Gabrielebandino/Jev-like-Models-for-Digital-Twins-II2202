@@ -1,0 +1,148 @@
+{
+  "name": "NDT_8Link_SharedPath_Backbone",
+  "num_links": 8,
+  "links": [
+    {
+      "id": 0,
+      "name": "L0",
+      "role": "core_ingress_west",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 1,
+      "name": "L1",
+      "role": "core_transit_west",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 2,
+      "name": "L2",
+      "role": "core_ingress_north",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 3,
+      "name": "L3",
+      "role": "core_transit_north",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 4,
+      "name": "L4",
+      "role": "core_backbone_east",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 5,
+      "name": "L5",
+      "role": "core_backbone_south",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 6,
+      "name": "L6",
+      "role": "aggregation_uplink_A",
+      "capacity_gbps": 10.0
+    },
+    {
+      "id": 7,
+      "name": "L7",
+      "role": "aggregation_uplink_B",
+      "capacity_gbps": 10.0
+    }
+  ],
+  "od_flows": {
+    "F0_core_west_east": [
+      {
+        "link_id": 0,
+        "share": 1.0
+      },
+      {
+        "link_id": 1,
+        "share": 0.9
+      },
+      {
+        "link_id": 4,
+        "share": 0.85
+      }
+    ],
+    "F1_core_north_south": [
+      {
+        "link_id": 2,
+        "share": 1.0
+      },
+      {
+        "link_id": 3,
+        "share": 0.95
+      },
+      {
+        "link_id": 5,
+        "share": 0.8
+      }
+    ],
+    "F2_edge_aggregation_A": [
+      {
+        "link_id": 0,
+        "share": 0.5
+      },
+      {
+        "link_id": 2,
+        "share": 0.6
+      },
+      {
+        "link_id": 6,
+        "share": 1.0
+      }
+    ],
+    "F3_edge_aggregation_B": [
+      {
+        "link_id": 1,
+        "share": 0.55
+      },
+      {
+        "link_id": 3,
+        "share": 0.5
+      },
+      {
+        "link_id": 7,
+        "share": 1.0
+      }
+    ],
+    "F4_cross_datacenter": [
+      {
+        "link_id": 4,
+        "share": 0.7
+      },
+      {
+        "link_id": 5,
+        "share": 0.75
+      },
+      {
+        "link_id": 6,
+        "share": 0.6
+      },
+      {
+        "link_id": 7,
+        "share": 0.65
+      }
+    ],
+    "F5_background_mesh": [
+      {
+        "link_id": 0,
+        "share": 0.3
+      },
+      {
+        "link_id": 3,
+        "share": 0.35
+      },
+      {
+        "link_id": 4,
+        "share": 0.4
+      },
+      {
+        "link_id": 7,
+        "share": 0.3
+      }
+    ]
+  }
+}

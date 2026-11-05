@@ -1,0 +1,72 @@
+{
+  "suite": "II2202_Research_Plan_Section_2_4_QA_Verification",
+  "all_passed": true,
+  "num_checks": 6,
+  "num_passed": 6,
+  "checks": [
+    {
+      "check_id": 1,
+      "name": "constant_state_zero_error",
+      "passed": true,
+      "details": {
+        "fixed_mae": 0.0,
+        "change_aware_mae": 0.0,
+        "rule_switcher_mae": 0.0
+      }
+    },
+    {
+      "check_id": 2,
+      "name": "hand_worked_analytical_mae",
+      "passed": true,
+      "details": {
+        "simulator_mae": 10.396,
+        "analytical_expected_mae": 10.396,
+        "abs_diff": 0.0
+      }
+    },
+    {
+      "check_id": 3,
+      "name": "policy_switching_without_extra_poll",
+      "passed": true,
+      "details": {
+        "switch_count": 2,
+        "spurious_poll_at_switch_1_t15_2s": 0,
+        "spurious_poll_at_switch_2_t30_2s": 0
+      }
+    },
+    {
+      "check_id": 4,
+      "name": "delayed_and_out_of_order_reply_rejection",
+      "passed": true,
+      "details": {
+        "poll2_accepted": true,
+        "late_poll1_accepted": false,
+        "rejected_out_of_order_count": 1,
+        "stored_utilization_after_late_arrival": 55.0
+      }
+    },
+    {
+      "check_id": 5,
+      "name": "timeout_and_invalid_output_fallback",
+      "passed": true,
+      "details": {
+        "review_count": 3,
+        "fallback_count": 3,
+        "fallback_rate": 1.0,
+        "switch_count": 0,
+        "retained_fixed_policy_fraction": 1.0
+      }
+    },
+    {
+      "check_id": 6,
+      "name": "absence_of_future_state_leakage",
+      "passed": true,
+      "details": {
+        "polls_visible_at_t15": 1,
+        "latest_visible_sample_time_s": 5.0,
+        "visible_L0_utilization_pct": 25.0,
+        "unarrived_future_L0_utilization_pct": 95.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+regime,delay_condition,candidate_controller,reference_baseline,num_paired_seeds,candidate_mean_mae_pct,baseline_mean_mae_pct,paired_mae_diff_mean_pct,paired_mae_diff_ci95_low,paired_mae_diff_ci95_high,candidate_mean_monitoring_bytes,baseline_mean_monitoring_bytes,paired_bytes_diff_mean,paired_bytes_diff_ci95_low,paired_bytes_diff_ci95_high
+stable,low_delay,rule_switcher,fixed,12,0.822,0.822,0.0,0.0,0.0,10696.0,10696.0,0.0,0.0,0.0
+stable,low_delay,rule_switcher,change_aware,12,0.822,0.9598,-0.1379,-0.1726,-0.1031,10696.0,6725.0,3971.0,2978.0,4964.0
+stable,elevated_delay,rule_switcher,fixed,12,0.9288,0.9288,0.0,0.0,0.0,10696.0,10696.0,0.0,0.0,0.0
+stable,elevated_delay,rule_switcher,change_aware,12,0.9288,1.0354,-0.1065,-0.1421,-0.071,10696.0,6725.0,3971.0,2978.0,4964.0
+bursty,low_delay,rule_switcher,fixed,12,2.8811,3.609,-0.7279,-0.919,-0.5367,20633.7,10696.0,9937.7,9236.9,10638.5
+bursty,low_delay,rule_switcher,change_aware,12,2.8811,2.7892,0.0919,-0.1475,0.3314,20633.7,22002.7,-1369.0,-2414.7,-323.3
+bursty,elevated_delay,rule_switcher,fixed,12,3.8134,4.6727,-0.8594,-1.0724,-0.6464,21112.3,10696.0,10416.3,9475.7,11357.0
+bursty,elevated_delay,rule_switcher,change_aware,12,3.8134,3.7883,0.025,-0.194,0.244,21112.3,21871.3,-759.0,-1817.6,299.6
+alternating,low_delay,rule_switcher,fixed,12,3.9086,5.76,-1.8513,-2.0221,-1.6806,24284.3,10696.0,13588.3,12737.3,14439.3
+alternating,low_delay,rule_switcher,change_aware,12,3.9086,3.9667,-0.0581,-0.2621,0.146,24284.3,24481.7,-197.3,-934.9,540.2
+alternating,elevated_delay,rule_switcher,fixed,12,5.5376,6.3299,-0.7923,-0.9251,-0.6594,23906.3,10696.0,13210.3,12381.6,14039.1
+alternating,elevated_delay,rule_switcher,change_aware,12,5.5376,5.7772,-0.2395,-0.4112,-0.0679,23906.3,23666.3,240.0,-780.0,1260.0
+shifted,low_delay,rule_switcher,fixed,12,1.3781,1.4297,-0.0515,-0.0942,-0.0089,10209.7,10696.0,-486.3,-777.2,-195.4
+shifted,low_delay,rule_switcher,change_aware,12,1.3781,1.6291,-0.2509,-0.4389,-0.0629,10209.7,7181.3,3028.3,2076.9,3979.7
+shifted,elevated_delay,rule_switcher,fixed,12,1.6125,1.6632,-0.0507,-0.0893,-0.0121,10126.7,10687.0,-560.3,-831.0,-289.6
+shifted,elevated_delay,rule_switcher,change_aware,12,1.6125,1.8694,-0.2568,-0.4431,-0.0706,10126.7,7188.0,2938.7,2066.1,3811.3

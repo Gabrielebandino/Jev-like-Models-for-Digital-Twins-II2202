@@ -1,0 +1,99 @@
+{
+  "project": "Decision-Model Policy Selection for Network Digital Twin Synchronization (II2202)",
+  "authors": [
+    "Gabriele Bandino <bandino@kth.se>",
+    "Jago Revrenna <revrenna@kth.se>"
+  ],
+  "timestamp_utc": "2026-11-05T19:42:43Z",
+  "python_version": "3.12.2 | packaged by conda-forge | (main, Feb 16 2024, 20:54:21) [Clang 16.0.6 ]",
+  "platform": "macOS-15.3.1-arm64-arm-64bit",
+  "numpy_version": "1.26.4",
+  "pandas_version": "2.2.3",
+  "pilot_seeds": [
+    101,
+    102,
+    103
+  ],
+  "heldout_seeds": [
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006,
+    1007,
+    1008,
+    1009,
+    1010,
+    1011,
+    1012
+  ],
+  "repeat_stability_seeds": [
+    1001,
+    1002
+  ],
+  "traffic_regimes": [
+    "stable",
+    "bursty",
+    "alternating",
+    "shifted"
+  ],
+  "delay_conditions": [
+    "low_delay",
+    "elevated_delay"
+  ],
+  "topology_summary": {
+    "name": "NDT_8Link_SharedPath_Backbone",
+    "num_links": 8,
+    "num_od_flows": 6
+  },
+  "frozen_protocol": {
+    "trace_duration_s": 180.0,
+    "warmup_duration_s": 20.0,
+    "tick_dt_s": 0.1,
+    "poll_request_bytes": 40,
+    "poll_reply_bytes": 108,
+    "candidate_fixed_intervals_s": [
+      1.0,
+      2.5,
+      5.0
+    ],
+    "default_fixed_interval_s": 2.5,
+    "ca_min_interval_s": 0.5,
+    "ca_max_interval_s": 6.0,
+    "ca_init_interval_s": 2.5,
+    "ca_high_change_threshold": 4.5,
+    "ca_low_change_threshold": 1.8,
+    "ca_quiet_streak_required": 2,
+    "ca_shorten_factor": 0.5,
+    "ca_lengthen_factor": 1.5,
+    "review_period_s": 15.0,
+    "decision_deadline_ms": 2000.0,
+    "rule_volatility_threshold": 3.2,
+    "rule_max_link_delta_threshold": 6.5,
+    "rule_max_age_safety_s": 4.5,
+    "candidate_models": {
+      "laya": {
+        "hf_repo": "convaiinnovations/laya",
+        "revision": "7b928d828b7b0e022f929d9bd2e44165aa270148",
+        "architecture": "ModernBERT-large non-autoregressive System-1 (~421M)",
+        "precision_t4": "float16"
+      },
+      "kev_4b": {
+        "hf_repo": "jaredpalmer/kev-4b",
+        "revision": "6cfce5c2fa4b4bd64026336ab649c5ca78857d52",
+        "base_model": "Qwen/Qwen3.5-4B-Base",
+        "architecture": "Qwen3.5-4B + Rank-16 LoRA + Pointer Head",
+        "precision_t4": "4bit-nf4-float16"
+      },
+      "clm_8b": {
+        "hf_repo": "Contrastive-LM/CLM-v0.1-8B",
+        "revision": "e939398d4556fcd9400c76fa8c5a513202f42b0a",
+        "base_model": "Qwen/Qwen3-8B",
+        "architecture": "Frozen Qwen3-8B last-token pooling + Dual InfoNCE Projection Heads (~40M)",
+        "precision_t4": "4bit-nf4-float16"
+      }
+    }
+  },
+  "torch_version": "not_installed_locally"
+}
