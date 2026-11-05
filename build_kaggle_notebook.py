@@ -93,7 +93,8 @@ Installs `laya[serve]`, `typesafe-sdk`, `bitsandbytes`, `peft`, `accelerate`, an
         ),
         make_code_cell(
             """# Remove Kaggle's incompatible pre-installed torchao 0.10.0 so peft loads cleanly
-!pip uninstall -y -q torchao
+!pip uninstall -y torchao
+!rm -rf /usr/local/lib/python3.13/dist-packages/torchao* /usr/local/lib/python3.12/dist-packages/torchao*
 
 # Install packages without touching Kaggle's pre-installed torch/cuda
 !pip install -q --no-warn-script-location \\
