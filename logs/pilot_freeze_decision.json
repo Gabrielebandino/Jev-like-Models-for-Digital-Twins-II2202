@@ -1,0 +1,63 @@
+{
+  "selected_primary_model": "clm_8b",
+  "selection_rationale": "Selected via prespecified Pilot Feasibility Gate criteria (Research Plan \u00a72.2): 100% parseable two-option Choice output, lowest decision latency well below the 2000ms deadline, zero personal cost on T4 GPU, and zero fallback rate.",
+  "pilot_screen_table": [
+    {
+      "model_key": "laya",
+      "hf_repo": "convaiinnovations/laya",
+      "revision": "7b928d828b",
+      "precision_t4": "float16",
+      "gpu_vram_mb": 2651.0,
+      "bench50_mean_ms": 47.19,
+      "bench50_p50_ms": 46.09,
+      "bench50_p95_ms": 50.86,
+      "bench50_p99_ms": 64.19,
+      "parse_valid_rate": 1.0,
+      "pilot_mae_mean_pct": 2.5917,
+      "pilot_monitoring_bytes_mean": 15767.5,
+      "pilot_fallback_rate": 0.0,
+      "pilot_fixed_fraction": 0.271,
+      "pilot_change_aware_fraction": 0.729,
+      "pilot_24traces_runtime_s": 14.76,
+      "meets_deadline_2000ms": true
+    },
+    {
+      "model_key": "kev_4b",
+      "hf_repo": "jaredpalmer/kev-4b",
+      "revision": "6cfce5c2fa",
+      "precision_t4": "4bit-nf4-float16",
+      "gpu_vram_mb": 14343.0,
+      "bench50_mean_ms": 661.3,
+      "bench50_p50_ms": 634.41,
+      "bench50_p95_ms": 649.46,
+      "bench50_p99_ms": 1387.12,
+      "parse_valid_rate": 1.0,
+      "pilot_mae_mean_pct": 2.677,
+      "pilot_monitoring_bytes_mean": 14752.8,
+      "pilot_fallback_rate": 0.0455,
+      "pilot_fixed_fraction": 0.29,
+      "pilot_change_aware_fraction": 0.71,
+      "pilot_24traces_runtime_s": 550.68,
+      "meets_deadline_2000ms": true
+    },
+    {
+      "model_key": "clm_8b",
+      "hf_repo": "Contrastive-LM/CLM-v0.1-8B",
+      "revision": "e939398d45",
+      "precision_t4": "4bit-nf4-float16",
+      "gpu_vram_mb": 5099.0,
+      "bench50_mean_ms": 15.04,
+      "bench50_p50_ms": 5.0,
+      "bench50_p95_ms": 5.77,
+      "bench50_p99_ms": 261.74,
+      "parse_valid_rate": 1.0,
+      "pilot_mae_mean_pct": 2.8097,
+      "pilot_monitoring_bytes_mean": 15835.3,
+      "pilot_fallback_rate": 0.0,
+      "pilot_fixed_fraction": 0.087,
+      "pilot_change_aware_fraction": 0.913,
+      "pilot_24traces_runtime_s": 163.42,
+      "meets_deadline_2000ms": true
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+model_key,hf_repo,revision,precision_t4,gpu_vram_mb,bench50_mean_ms,bench50_p50_ms,bench50_p95_ms,bench50_p99_ms,parse_valid_rate,pilot_mae_mean_pct,pilot_monitoring_bytes_mean,pilot_fallback_rate,pilot_fixed_fraction,pilot_change_aware_fraction,pilot_24traces_runtime_s,meets_deadline_2000ms
+laya,convaiinnovations/laya,7b928d828b,float16,2651.0,47.19,46.09,50.86,64.19,1.0,2.5917,15767.5,0.0,0.271,0.729,14.76,True
+kev_4b,jaredpalmer/kev-4b,6cfce5c2fa,4bit-nf4-float16,14343.0,661.3,634.41,649.46,1387.12,1.0,2.677,14752.8,0.0455,0.29,0.71,550.68,True
+clm_8b,Contrastive-LM/CLM-v0.1-8B,e939398d45,4bit-nf4-float16,5099.0,15.04,5.0,5.77,261.74,1.0,2.8097,15835.3,0.0,0.087,0.913,163.42,True
