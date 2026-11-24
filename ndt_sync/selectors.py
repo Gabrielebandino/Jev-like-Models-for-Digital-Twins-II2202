@@ -21,24 +21,26 @@ from .config import NUM_LINKS, LINK_NAMES, DEFAULT_PROTOCOL, ExperimentProtocol
 from .twin import NetworkDigitalTwin, AcceptedObservation
 
 
-# Frozen System-One Choice question specification used across all candidate models
+# Frozen, NEUTRAL System-One Choice question specification (ZERO spoon-feeding / ZERO pre-labeled hints)
 FROZEN_POLICY_CHOICE_QUESTION = {
     "selected_policy": {
         "type": "choice",
         "instructions": (
-            "Classify the current network telemetry state to select the synchronization polling policy: "
-            "pick 'change-aware' if the state reports HIGH_VOLATILITY_OR_BURST, MODERATE_VARIATION, "
-            "traffic spikes, bursts, or link changes above 3%; pick 'fixed' only if the state reports "
-            "LOW_STEADY_VARIATION with minimal link changes."
+            "You are a Network Digital Twin synchronization controller. Based solely on the "
+            "numerical telemetry measurements below, choose which polling policy should run for "
+            "the next review period: 'fixed' or 'change-aware'. "
+            "Goal: balance twin-state accuracy against monitoring traffic overhead."
         ),
         "criteria": {
             "fixed": (
-                "LOW_STEADY_VARIATION: Network link utilization is completely flat, stable, and quiet "
-                "with negligible observed deltas (< 2% change)."
+                "Fixed-interval polling (constant 2.5s period). Provides predictable, bounded "
+                "monitoring overhead and avoids over-polling during steady periods or isolated "
+                "non-critical noise."
             ),
             "change-aware": (
-                "HIGH_VOLATILITY_OR_BURST or MODERATE_VARIATION: Network links show bursts, traffic spikes, "
-                "load shifts, or noticeable utilization deltas (>= 2.5% change) requiring adaptive polling."
+                "Adaptive change-aware polling (interval adapts between 0.5s and 6.0s based on "
+                "observed link deltas). Polls faster during rapid network-wide changes and slows "
+                "down during extended quiet periods."
             ),
         },
     }
@@ -65,39 +67,25 @@ class ReviewSummary:
     per_link_recent_abs_change_pct: Dict[str, float]
 
     def to_prompt_text(self) -> str:
-        """Render compact, structured plain-text state for System-One decision models."""
+        """Render strictly raw, neutral numerical telemetry for the decision model (NO if/else labels)."""
         links_str = ", ".join(
-            f"{k}={v:.1f}% (Δ={self.per_link_recent_abs_change_pct[k]:.1f}%)"
+            f"{k}={v:.1f}% (delta={self.per_link_recent_abs_change_pct[k]:.1f}%)"
             for k, v in self.per_link_latest_utilization_pct.items()
         )
-        is_volatile = (
-            self.recent_max_abs_change_pct >= 5.5
-            or self.recent_mean_abs_change_pct >= 2.8
-            or self.recent_change_std_pct >= 2.0
-        )
-        volatility_desc = (
-            "HIGH_VOLATILITY_OR_BURST (spikes and rapid link variations detected -> requires change-aware adaptive polling)"
-            if is_volatile
-            else (
-                "MODERATE_VARIATION (active link fluctuations -> prefer change-aware adaptive polling)"
-                if self.recent_max_abs_change_pct >= 2.5
-                else "LOW_STEADY_VARIATION (completely flat, quiet, and stable traffic -> use fixed polling)"
-            )
-        )
         return (
-            f"Network Digital Twin Synchronization Review at t={self.review_time_s:.1f}s\n"
-            f"State Classification: {volatility_desc}\n"
+            f"Network Digital Twin Telemetry Snapshot at t={self.review_time_s:.1f}s\n"
             f"Current Active Policy: {self.current_active_policy} (interval={self.current_policy_interval_s:.2f}s)\n"
-            f"Current Measurement Age (AoI): {self.measurement_age_aoi_s:.2f}s "
+            f"Measurement Age (AoI): {self.measurement_age_aoi_s:.2f}s "
             f"(latest sample t={self.latest_sample_time_s:.2f}s, received t={self.latest_arrival_time_s:.2f}s)\n"
-            f"Recent Polling Activity: {self.polls_received_in_window} polls received in last review window "
+            f"Polling Activity: {self.polls_received_in_window} polls in last review window "
             f"({self.total_polls_received} total accepted polls)\n"
-            f"Observed Link Change Summary: "
-            f"recent_mean_abs_change={self.recent_mean_abs_change_pct:.2f}%, "
-            f"recent_max_abs_change={self.recent_max_abs_change_pct:.2f}%, "
-            f"change_volatility_std={self.recent_change_std_pct:.2f}%, "
+            f"Observed Link Change Statistics: "
+            f"mean_abs_change={self.recent_mean_abs_change_pct:.2f}%, "
+            f"max_abs_change={self.recent_max_abs_change_pct:.2f}%, "
+            f"std_abs_change={self.recent_change_std_pct:.2f}%, "
+            f"latest_poll_mean_delta={self.latest_poll_mean_change_pct:.2f}%, "
             f"latest_poll_max_delta={self.latest_poll_max_change_pct:.2f}%\n"
-            f"Per-Link Stored Utilization & Latest Observed Change (8 links): {links_str}"
+            f"Per-Link Utilization & Latest Delta ({len(self.per_link_latest_utilization_pct)} links): {links_str}"
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -196,16 +184,13 @@ class DeterministicRuleSelector:
         self.max_age_safety_s = protocol.rule_max_age_safety_s
 
     def select_policy(self, summary: ReviewSummary) -> SelectorDecisionResult:
-        # Rule logic using the exact same summary fields: observed changes and age
+        # Clean, transparent threshold rule using observed change statistics (no dead branches):
+        # Switch to change-aware when volatility exceeds preset thresholds; otherwise use fixed.
         if (
             summary.recent_max_abs_change_pct >= self.max_delta_threshold
             or summary.recent_mean_abs_change_pct >= self.volatility_threshold
             or summary.recent_change_std_pct >= 2.2
         ):
-            choice = "change-aware"
-            probs = {"fixed": 0.0, "change-aware": 1.0}
-        elif summary.measurement_age_aoi_s >= self.max_age_safety_s and summary.recent_max_abs_change_pct < 1.5:
-            # Quiet period with low variation: change-aware backs off safely to save monitoring traffic
             choice = "change-aware"
             probs = {"fixed": 0.0, "change-aware": 1.0}
         else:

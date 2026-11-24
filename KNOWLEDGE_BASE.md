@@ -71,6 +71,9 @@ The planned workload families are stable traffic, short bursts, alternating quie
 
 - Replay the same synthetic trace/seed across controllers.
 - The evaluator sees ground truth only to calculate error; controllers see only data received by the twin.
+- **Zero prompt spoon-feeding:** The decision model receives **strictly raw, neutral numerical telemetry** (timestamps, AoI, poll counts, observed deltas, per-link utilizations/deltas) with **no pre-computed `if/else` regime labels or hints** telling it which policy to pick.
+- **Strict information parity:** Never withhold a summary feature from the rule baseline while giving it (or a pre-labeled version of it) to the decision model.
+- **Audit note (24 Nov 2026):** Earlier Nov 5–24 experimental runs (`logs/heldout_runs/` and `logs/sweet_spot_live_laya/`) contained pre-classified `if/else` labels inside `to_prompt_text()` / `build_multinode_state_text()`. Those runs are superseded by the new unbiased protocol in `ndt_fair_unbiased_kaggle_experiments.ipynb` and `ndt_sync/selectors.py`.
 - Freeze policy settings, model choice/version, request format, selector timing, and analysis choices before held-out main runs.
 - Keep the previous policy active while a model decision is pending.
 - Record fallback if a decision is late or invalid; do not turn this into a hidden successful choice.

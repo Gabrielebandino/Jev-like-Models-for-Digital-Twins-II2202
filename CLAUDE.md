@@ -31,6 +31,9 @@ They describe a Jev-specific design and, in older phases, link selection. They a
 
 ## Working rules
 
+- **ZERO PROMPT SPOON-FEEDING & STRICT INFORMATION PARITY (CRITICAL):** Never put `if/else` regime classifications or decision hints (e.g. `HIGH_VOLATILITY -> use change-aware` or `LOCALIZED_EDGE_NOISE -> use fixed`) inside the prompt sent to any decision model! The model MUST receive strictly raw, neutral numerical telemetry and make the choice itself. Both `rule_switcher` and the decision model must have fair access to the same observable telemetry features.
+- **NO PROXY SHORTCUTS:** Never report a Python heuristic proxy as a "decision model" result. Every reported model metric must come from genuine live model inference.
+- **PARETO FAIRNESS:** Never claim a controller "wins" solely because it has lower error at higher traffic OR lower traffic at higher error; always plot against the full static `fixed` curve (`1.0s`, `2.5s`, `5.0s`) and compare at overlapping traffic levels.
 - Write course deliverables in natural, clear English; use Italian for discussion with Jago unless asked otherwise.
 - Keep claims bounded by what is measured. Do not invent results, access, credits, costs, approvals, sources, or deadlines.
 - Use synthetic data only; no private traces, credentials in logs, live-network control, model training, or personal spending.
