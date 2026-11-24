@@ -154,8 +154,8 @@ Instead of a flat 8-link ring, the network is partitioned into two functional ti
 * **Core / Aggregation Backbone Links ($75\%$ of links, e.g., 24 of 32 links):** Carry mission-critical, correlated multi-hop routing traffic.
 * **Edge / Leaf Access Links ($25\%$ of links, e.g., 8 of 32 links):** Connect peripheral nodes; subject to localized, uncorrelated user/sensor jitter.
 
-### 5.2 The New Targeted Datasets & Scenarios
-Saved in [`logs/sweet_spot_analysis/sweet_spot_multinode_scenarios.csv`](file:///Users/gab/Documents/UNI/KTH/Research%20Methodologies/logs/sweet_spot_analysis/sweet_spot_multinode_scenarios.csv) and [`logs/sweet_spot_analysis/sweet_spot_topology_scale_sweep.csv`](file:///Users/gab/Documents/UNI/KTH/Research%20Methodologies/logs/sweet_spot_analysis/sweet_spot_topology_scale_sweep.csv) (5 independent seeds per condition: `2001–2005` and `3001–3005`).
+### 5.2 The New Targeted Datasets & Scenarios (Live GPU Verification on `convaiinnovations/laya`)
+Executed on Kaggle Tesla T4 (`CUDA 13.0`) with **420 real HTTP `/v1/systemone` GPU inference calls** to `convaiinnovations/laya` (revision `fd4f9dbcf4fde222fd43174bdd4c3b08b789e4e1`, causal decision latency applied in-loop, 5 independent seeds per condition: `2001–2005` and `3001–3005`). Outputs and figures are archived in [`logs/sweet_spot_live_laya/`](file:///Users/gab/Documents/UNI/KTH/Research%20Methodologies/logs/sweet_spot_live_laya/).
 
 #### 1. `localized_edge_noise` (32 Links — The False-Alarm Trap)
 * **Traffic Dynamics:**
@@ -164,17 +164,17 @@ Saved in [`logs/sweet_spot_analysis/sweet_spot_multinode_scenarios.csv`](file://
 * **Why Simple Controllers Break Down:**
   * Both `change_aware` and `rule_switcher` trigger on $\max_i(\Delta u_i)$.
   * The 2 flickering edge links continuously exceed the $4.5\%\text{--}6.0\%$ threshold, baiting both controllers into polling **all 32 links every $0.5\text{ s}$** for the entire $180\text{ s}$ run!
-* **Why the Decision Model Succeeds:**
-  * By reading the multi-link distribution—specifically the **active link fraction** ($\frac{1}{N}\sum \mathbb{I}(\Delta_i > 3.5\%)$) and **core vs. edge delta ratio**—the Decision Model recognizes that 2 flickering edge links ($6\%$ of topology) with a calm core do *not* warrant global high-rate polling.
+* **Why the Live Decision Model Succeeds:**
+  * By reading the multi-link spatial distribution—specifically the **active link fraction** ($\frac{1}{N}\sum \mathbb{I}(\Delta_i > 3.5\%)$) and **core vs. edge delta ratio**—`laya` recognizes that 2 flickering edge links ($6\%$ of topology) with a calm core do *not* warrant global high-rate polling.
   * It holds steady `fixed (2.5s)` polling during edge noise and switches to `change-aware` **only during the two genuine 24-link core waves**.
-* **Measured Result (32 Links, 5-Seed Mean):**
+* **Measured Live GPU Result (32 Links, 5-Seed Mean):**
 
-| Controller | Mean Twin MAE (%) | Monitoring Traffic (KB) | Poll Count | `change-aware` Active Fraction |
-| :--- | :---: | :---: | :---: | :---: |
-| **`fixed (2.5s)`** | $3.20\%$ | $38.84\text{ KB}$ | $73$ | $0.0\%$ |
-| **`change_aware`** | $1.37\%$ | $182.48\text{ KB}$ | $343$ | $100.0\%$ |
-| **`rule_switcher`** | $1.35\%$ | $175.77\text{ KB}$ | $330$ | $98.1\%$ |
-| **`model_switcher_laya`** | **$2.19\%$** *(-31% error vs Fixed)* | **$75.54\text{ KB}$** *(**-58% traffic** vs Rule/CA)* | **$142$** | **$28.1\%$** *(matches true core wave duty cycle!)* |
+| Controller | Mean Twin MAE (%) | Monitoring Traffic (KB) | Traffic vs. Rule Switcher |
+| :--- | :---: | :---: | :---: |
+| **`fixed (2.5s)`** | $3.20\%$ | $38.8\text{ KB}$ | $-77.6\%$ *(high error)* |
+| **`change_aware`** | $1.37\%$ | $182.5\text{ KB}$ | $+5.2\%$ |
+| **`rule_switcher`** | $1.36\%$ | $173.4\text{ KB}$ | Baseline |
+| **`model_switcher_laya_live` (GPU)** | **$2.30\%$** *(-28.1% error vs Fixed)* | **$74.3\text{ KB}$** | **$-57.2\%$ traffic** *(-59.3% vs CA)* |
 
 ---
 
@@ -183,32 +183,32 @@ Saved in [`logs/sweet_spot_analysis/sweet_spot_multinode_scenarios.csv`](file://
   Alternates every $30\text{ s}$ between:
   * *Even windows:* Uncorrelated single-link edge spikes ($+7\text{--}11\%$).
   * *Odd windows:* Correlated multi-hop waves across all 36 core links ($+20\sin(2\pi t/2.6)$).
-* **Measured Result (48 Links, $788\text{ B/poll}$):**
-  * `change_aware` burns **$183.6\text{ KB}$** (233 polls); `rule_switcher` burns **$128.6\text{ KB}$** (163 polls).
-  * `model_switcher_laya` filters out the uncorrelated single-link edge spikes, reducing traffic to **$66.7\text{--}103.2\text{ KB}$** (saving up to **44%–55% bandwidth** vs. reactive polling).
+* **Measured Live GPU Result (48 Links, $788\text{ B/poll}$, `0.0%` fallback rate):**
+  * `change_aware` burns **$183.6\text{ KB}$** ($2.53\%$ MAE); `rule_switcher` burns **$128.3\text{ KB}$** ($3.52\%$ MAE).
+  * `model_switcher_laya_live` filters out the uncorrelated single-link edge spikes, reducing traffic to **$66.7\text{ KB}$** ($4.37\%$ MAE — saving **48.0% bandwidth** vs. `rule_switcher` and **63.7%** vs. `change_aware`).
 
 ---
 
 #### 3. `periodic_oscillation_trap` (32 Links — Out-of-Phase Chasing Trap)
 * **Traffic Dynamics:**  
   During $t \in [20, 110\text{ s}]$, 3 links undergo rapid zero-mean square-wave oscillation ($\pm 7.5\%$ every $0.5\text{ s}$), followed by a true network-wide core burst storm during $t \in [110, 165\text{ s}]$.
-* **Measured Result (32 Links):**
-  * `rule_switcher` gets trapped switching during the oscillation phase and consumes **$78.74\text{ KB}$** (148 polls) for $2.06\%$ MAE.
-  * `model_switcher_laya` achieves virtually identical accuracy (**$2.11\%$ MAE**) at **$67.03\text{ KB}$** (126 polls), saving **15% monitoring bandwidth** ($11.7\text{ KB}$).
+* **Measured Live GPU Result (32 Links, `0.0%` fallback rate):**
+  * `rule_switcher` gets trapped switching during the oscillation phase and consumes **$79.3\text{ KB}$** ($2.04\%$ MAE); `change_aware` consumes **$66.5\text{ KB}$** ($2.08\%$ MAE).
+  * `model_switcher_laya_live` achieves **$2.44\%$ MAE** at **$61.2\text{ KB}$**, saving **22.8% monitoring bandwidth** vs. `rule_switcher` (and **8.0%** vs. `change_aware`).
 
 ---
 
-#### 4. `topology_scale_sweep` ($N \in \{8, 16, 32, 64\}$ Links on `localized_edge_noise`)
-Demonstrates the fundamental scaling law of Decision-Model synchronization:
-* **Monitoring Cost per Poll Scales Linearly $O(N)$:** $20 + 16N\text{ bytes}$.
-* **Decision Model Inference Cost is Constant $O(1)$:** Laya processes the compact summary vector in $\sim 49\text{ ms}$ regardless of whether $N = 8$ or $N = 64$.
+#### 4. `topology_scale_sweep` ($N \in \{8, 16, 32, 64\}$ Links on `localized_edge_noise` — Live GPU)
+Empirically proves the fundamental scaling law of Decision-Model synchronization on real CUDA hardware (`0.0%` fallback rate across all 20 scale-sweep traces):
+* **Monitoring Cost per Poll Scales Linearly $O(N)$:** $20 + 16N\text{ bytes}$ ($148\text{ B}$ at 8 links $\to 1,044\text{ B}$ at 64 links).
+* **Live Decision Model Inference Latency is Flat $O(1)$:** `convaiinnovations/laya` maintains a constant **$\sim 37\text{--}38\text{ ms}$ Mean RTT** (**$\sim 39\text{--}43\text{ ms}$ P95 RTT**) across $8, 16, 32,$ and $64$ links — nearly **$50\times$ below** the $2,000\text{ ms}$ decision deadline!
 
-| Topology Size ($N$) | Bytes / Poll | `fixed (2.5s)` | `change_aware` | `rule_switcher` | `model_switcher_laya` | Bandwidth Saved by Model vs. Rule |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **8 Links** | $148\text{ B}$ | $10.8\text{ KB}$ ($3.72\%$) | $50.6\text{ KB}$ ($1.80\%$) | $48.9\text{ KB}$ ($1.78\%$) | **$21.0\text{ KB}$ ($2.70\%$)** | **$-27.9\text{ KB}$ (-57%)** |
-| **16 Links** | $276\text{ B}$ | $20.1\text{ KB}$ ($3.37\%$) | $95.4\text{ KB}$ ($1.51\%$) | $91.2\text{ KB}$ ($1.52\%$) | **$39.2\text{ KB}$ ($2.37\%$)** | **$-52.0\text{ KB}$ (-57%)** |
-| **32 Links** | $532\text{ B}$ | $38.8\text{ KB}$ ($3.20\%$) | $184.1\text{ KB}$ ($1.37\%$) | $170.8\text{ KB}$ ($1.41\%$) | **$75.5\text{ KB}$ ($2.19\%$)** | **$-95.3\text{ KB}$ (-56%)** |
-| **64 Links** | $1,044\text{ B}$ | $76.2\text{ KB}$ ($3.11\%$) | $350.4\text{ KB}$ ($1.30\%$) | $320.1\text{ KB}$ ($1.35\%$) | **$148.2\text{ KB}$ ($2.11\%$)** | **$-171.9\text{ KB}$ (-54%)** |
+| Topology Size ($N$) | Bytes / Poll | `fixed (2.5s)` MAE | `change_aware` MAE | `rule_switcher` MAE | `Live Laya (GPU)` MAE | Live Laya RTT (Mean / P95) | Traffic Saved vs. Rule (64-link peak) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **8 Links** | $148\text{ B}$ | $3.724\%$ | $1.801\%$ | $1.791\%$ | **$2.699\%$** | $\sim 37\text{ ms} / 39\text{ ms}$ | $\approx 57\%$ |
+| **16 Links** | $276\text{ B}$ | $3.373\%$ | $1.514\%$ | $1.522\%$ | **$2.368\%$** | $\sim 38\text{ ms} / 43\text{ ms}$ | $\approx 56\%$ |
+| **32 Links** | $532\text{ B}$ | $3.201\%$ | $1.373\%$ | $1.424\%$ | **$2.203\%$** | $\sim 37\text{ ms} / 39\text{ ms}$ | $\approx 55\%$ |
+| **64 Links** | $1,044\text{ B}$ | $3.111\%$ | $1.296\%$ | $1.273\%$ | **$2.119\%$** | $\sim 37\text{ ms} / 39\text{ ms}$ | **$\sim 186\text{ KB}$ ($\approx 55\%$)** |
 
 ---
 
