@@ -81,7 +81,7 @@ class LiveLayaUnbiasedClient:
                 return {
                     "choice": None, "is_valid": False, "latency_ms": latency_ms,
                     "req_bytes": len(payload_bytes), "rep_bytes": len(resp.content),
-                    "p_fixed": 0.0, "p_ca": 0.0, "error": f"http_{resp.status_code}",
+                    "p_fixed": 0.0, "p_ca": 0.0, "error": f"http_{resp.status_code}:{resp.text[:300]}",
                 }
             data = resp.json()
             ans = (data.get("answers") or {}).get("selected_policy") or {}
@@ -469,10 +469,25 @@ def run_all_fair_experiments(output_dir: str = "logs/fair_unbiased_laya") -> Tup
     os.makedirs(output_dir, exist_ok=True)
     client = LiveLayaUnbiasedClient()
 
-    # Warmup 3 live calls so CUDA kernels are JIT-compiled before timed traces
-    print("Warming up live Laya CUDA server (3 calls)...")
-    for _ in range(3):
-        client.query("Network Digital Twin Telemetry Snapshot at t=15.0s\nmean_abs_delta=1.0%, max_abs_delta=2.0%")
+    # Strict pre-flight diagnostic + 3-call CUDA warmup (fail loudly if API returns error)
+    print("Running pre-flight diagnostic & CUDA warmup on live Laya server...")
+    sample_prompt = (
+        "Network Digital Twin Telemetry Snapshot at t=15.0s\n"
+        "Topology: 8 monitored links (6 core, 2 edge)\n"
+        "Current Active Policy: fixed (current_interval=2.50s)\n"
+        "Measurement Age (AoI): 1.20s | Polls in last 15s window: 6 (total=6)\n"
+        "Observed Link Delta Statistics (last 15s received polls):\n"
+        "- global_mean_abs_delta=1.00%, global_max_abs_delta=2.00%, global_p90_abs_delta=1.80%, global_std_delta=0.40%\n"
+        "- core_mean_abs_delta=1.00%, edge_mean_abs_delta=1.00%, edge_max_abs_delta=2.00%\n"
+        "- links_with_delta_gt_3.5pct=0/8 (0.0%)\n"
+        "Link Readings: L0=25.0% (delta=1.0%), L1=24.0% (delta=0.8%)"
+    )
+    diag = client.query(sample_prompt)
+    print("  Pre-flight response:", json.dumps(diag, indent=2))
+    if not diag["is_valid"]:
+        raise RuntimeError(f"Pre-flight Laya query FAILED! Response={diag}. Check laya_fair_server.log!")
+    for _ in range(2):
+        client.query(sample_prompt)
 
     review_logs: List[Dict[str, Any]] = []
     suite_a_rows: List[Dict[str, Any]] = []
