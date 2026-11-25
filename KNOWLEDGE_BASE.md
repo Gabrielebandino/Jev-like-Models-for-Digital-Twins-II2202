@@ -1,7 +1,7 @@
 # II2202 Project Knowledge Base
 
-**Last updated:** 3 November 2026  
-**Status:** active working record; not a source of experimental results.
+**Last updated:** 25 November 2026  
+**Status:** active working record; includes verified mentor approval, methodological audit of Nov 5–25 runs, and the Master's-level recovery plan (`RESEARCH_RECOVERY_PLAN.md`).
 
 ## What changed compared with the previous version
 
@@ -112,12 +112,36 @@ Nadia's written feedback on the initial proposal asked for:
 2. Research questions organised around approaches, network conditions, and metrics.
 3. A clear account of the evidence used to call an approach suitable for a condition.
 
-The current experimental framing addresses these with a four-controller comparison, explicit scenario/metric separation, paired repeated simulation runs, and a pre-specified comparison at comparable communication levels. This is a design response, not evidence that Nadia has formally approved the final version.
+### Approval of Revised Research Plan (13 November 2026)
+Nadia Bekkali reviewed the revised research plan (`researchPlan5Nov/II2202-research-plan.tex`) and confirmed:
+- *"It is now much clearer and more rigorous in my opinion. Overall, the plan looks good."*
+- **One small clarification requested (for reporting & presentation):** Section 2.2 mentioned three candidate fixed intervals (`1.0 s`, `2.5 s`, `5.0 s`), while Section 2.3 referred to one selected interval. We clarified both §2.2 and §2.3 in `researchPlan5Nov/II2202-research-plan.tex` so it is explicit that the pilot evaluates the three candidates and freezes **one** representative interval (`2.5 s`, matching `ca_init_interval_s`) for the primary 4-controller comparison, while the others serve only as static Pareto frontier anchors.
+
+## 6b. Experimental Audit & Master's-Level Recovery Plan (25 November 2026)
+
+A rigorous self-audit of our Nov 5–24 runs (`logs/heldout_runs/`, `logs/sweet_spot_live_laya/`) identified **six methodological flaws**:
+1. **Prompt spoon-feeding (invalidates earlier model-switching claims):** Both `ndt_sync/selectors.py` and `run_sweet_spot_live_laya.py` ran a Python `if/else` over telemetry numbers and injected pre-computed text labels (`HIGH_VOLATILITY_OR_BURST -> requires change-aware`) into the prompt.
+2. **Class collapse on raw numerical telemetry (1,344-call unbiased GPU ablation, 25 Nov 2026):** After removing all `if/else` hints (`ndt_fair_unbiased_kaggle_experiments.ipynb`, Tesla T4 CUDA, `0.0%` fallback rate, `~48 ms` flat $O(1)$ latency across 8–64 links), `convaiinnovations/laya` (421M ModernBERT) collapsed **100% onto `'fixed'` (`change_aware_frac = 0.000`)** across all 8 regimes, 2 delays, and 4 scales—empirically confirming TypeSafe's documented numerical-precision limitation (`\cite{limits}`).
+3. **Orderless scalar flattening:** Compressing the 15-second lookback window into unordered `mean`/`max`/`std` scalars threw away chronological time-series order, EWMA momentum, trend slope, and oscillation sign-reversals.
+4. **Strawman deterministic baseline:** Comparing against a trivial 1-threshold rule rather than a standard networking EWMA + hysteresis controller.
+5. **Toy sine waves & arbitrary link array:** Phase 2 used ad-hoc sine waves instead of standard networking topologies and traffic models.
+6. **Non-overlapping Pareto comparisons:** Earlier runs lacked an iso-budget metric ($\Delta\text{MAE}_{\text{iso-bytes}}$) interpolated against the continuous static `fixed` frontier.
+
+### Active Redesign (`RESEARCH_RECOVERY_PLAN.md`)
+We drafted **`RESEARCH_RECOVERY_PLAN.md`** (currently queued for critical peer review by Claude & Jago) to rebuild the experiments on real networking standards while remaining 100% compliant with Nadia's approved plan:
+- **Standards:** IRTF NMRG NDT (`draft-irtf-nmrg-network-digital-twin-arch-13`), **IETF RFC 9232** (*Network Telemetry Framework*), **IETF RFC 8641** (*YANG-Push*: `periodic` vs. dampened `on-change`), **IETF RFC 6298** (*Jacobson–Karels EWMA*: $\alpha=1/8, \beta=1/4$), **SNDlib Abilene** (12 nodes, 15 bidirectional links, OSPF shortest-path routing), and canonical **Pareto ON/OFF + MMPP + OSPF failover** workloads.
+- **Temporal features & non-strawman baseline:** Ordered sliding-window time series, RFC 6298 fast/slow EWMA + deviation + momentum ratio, linear trend slope, signed-change reversal rate, and **`rule_ewma_hysteresis`**.
+- **Model scale ablation:** Evaluate **both** `laya` (421M) and an **8B backbone** (`clm_8b` / `Qwen2.5-7B-Instruct` 4-bit) with **zero prompt spoon-feeding** on raw temporal time series, evaluated via **$\Delta\text{MAE}_{\text{iso-bytes}}$**, 95% bootstrap CIs, and paired Wilcoxon tests ($n = 15$ held-out seeds).
 
 ## 7. Source map and precedence
 
 | Source | Modified / status | Use it for | Limitation |
 |---|---|---|---|
+| Shared GitHub repo (`Gabrielebandino/Jev-like-Models-for-Digital-Twins-II2202`, `@jagorev` invited) | Active (`main`); authoritative for code, traces, logs, and recovery plan. | All code, notebooks, QA checks, unbiased logs, and documentation. | Synced with local folder; check `git status` before pushing. |
+| `researchPlan5Nov/II2202-research-plan.tex` | 13 Nov 2026; approved by Nadia Bekkali and updated with §2.2–2.3 fixed-interval clarification. | Approved scope, RQs, method, quality checks, and bibliography. | Must be synced to Overleaf if re-compiling PDF. |
+| `RESEARCH_RECOVERY_PLAN.md` | 25 Nov 2026; active redesign draft for Claude & Jago peer review. | Next-generation standards-grounded experiment design (RFC 9232/8641/6298, SNDlib Abilene, EWMA, 8B ablation). | Pending peer review before coding v2. |
+| `RESEARCH_WORKLOADS_AND_REASONING.md` | 25 Nov 2026; chronicle including Phase 3 unbiased GPU ablation (`58710af`). | Historical audit trail + 1,344-call unbiased Laya class-collapse results (`logs/fair_unbiased_laya/`). | Earlier Phase 1/2 sections document superseded spoon-fed runs (flagged explicitly). |
+| `ndt_sync/selectors.py` & `ndt_fair_unbiased_kaggle_experiments.ipynb` | 24–25 Nov 2026; cleaned of all prompt spoon-feeding; all 6 QA checks passing. | Verified unbiased harness & fair Pareto evaluation plots. | Uses flat 15s stats; to be upgraded with RFC 6298 EWMA + ordered time series in v2. |
 | Current Overleaf research-plan project | Live; authoritative but not stored in this folder. | Final wording, tables, dates, and submission-ready content. | Must be opened before edits; local legacy source is not a substitute. |
 | `/Users/jagorev/Downloads/II2202_Research_Plan_Updated.pdf` | 29 Oct 2026; newest research-plan artifact located. | Latest rendered plan and final content check. | PDF is outside this folder; editable Overleaf source remains the source of truth. |
 | `II2202_Qualitative_Method_Exercise/main.tex` | 29 Oct 2026. | Latest local, editable confirmation of the general decision-model scope and the four-controller study. | Created for a qualitative-method exercise, not the main experimental protocol. |
@@ -165,16 +189,14 @@ AI can assist with language, coding, and source discovery, but Jago and Gabriele
 
 ## 12. Immediate next actions
 
-1. Open the live Overleaf research plan and verify it uses the general decision-model wording consistently.
-2. Select and document the feasibility-gate criteria before spending time on implementation.
-3. Agree the pilot protocol and freeze conditions before collecting main-run results.
-4. Check Canvas for status, deadlines, and required AI-use disclosure.
-5. Before final submission, perform a citation-by-citation source check and verify every reference is actually cited.
+1. **Peer-review `RESEARCH_RECOVERY_PLAN.md`** with Claude and Jago (resolving the 5 review questions in §7: 8-link vs. Abilene primary topology, adding an 8B instruction model alongside `laya`/`clm_8b`, whether hybrid NOC text is in scope, and $\Delta\text{MAE}_{\text{iso-bytes}}$).
+2. **Implement v2 standards-grounded simulator:** SNDlib Abilene + Pareto ON/OFF / MMPP / OSPF failover traces, ordered sliding-window + RFC 6298 EWMA features, and `rule_ewma_hysteresis`.
+3. **Run pilot horizon & parameter freeze** ($H \in \{5, 10, 15, 30\}\text{ s}$, 5 pilot seeds) and archive `frozen_protocol_v2.json`.
+4. **Run unbiased Kaggle T4 GPU evaluation** (zero prompt spoon-feeding) across `laya` (421M) and an 8B model on $n = 15$ held-out seeds.
+5. **Draft final II2202 report & 5-slide video presentation** incorporating the controlled ablation (spoon-fed vs. unbiased raw numbers), RFC 9232/8641/6298 framing, and full citation verification.
 
 ## Da confermare
 
-- Quale decision model verrà selezionato dopo il pilot, inclusi versione, licenza/accesso e costo effettivo pari a zero per gli studenti.
-- Parametri finali del pilot e dei main runs: topologia, scenari, seed, intervalli, soglie, review cadence, timeout e metriche esatte.
-- Stato di upload e scadenze ufficiali su Canvas per proposal, research plan, esercizio qualitativo, video, quiz e peer feedback.
-- Ruoli di implementazione finali tra Jago e Gabriele e repository condiviso per codice/log/configurazioni.
-- Conferma esplicita di Nadia sulla fattibilità della versione generalizzata ai decision models.
+- Decisione finale dopo review di Claude & Jago su `RESEARCH_RECOVERY_PLAN.md` (topologia primaria Abilene vs. 8-link, inclusione di un modello 8B instruction-tuned, e inclusione o meno di Condition B con testo NOC).
+- Parametri congelati nel pilot v2 (`frozen_protocol_v2.json`): orizzonte $H$, soglie EWMA/hysteresis, seed split ($n=5$ pilot, $n=15$ held-out).
+- Stato di upload e scadenze ufficiali su Canvas per report finale, presentazione video, quiz e peer feedback.
