@@ -226,7 +226,38 @@ Empirically proves the fundamental scaling law of Decision-Model synchronization
 
 ---
 
-## 7. Narrative Takeaways for Final Report & Presentation
+## 7. Phase 3 — The Fair, Unbiased Protocol (Zero Prompt Spoon-Feeding, 1,344 Live GPU Calls)
+
+### 7.1 Methodological Audit & Removal of Prompt Spoon-Feeding
+A critical self-audit of the earlier Phase 1 and Phase 2 runs uncovered a subtle experimental bias: both `ReviewSummary.to_prompt_text()` (Phase 1) and `build_multinode_state_text()` (Phase 2) ran a Python `if/else` over the telemetry numbers and injected semantic regime labels (`HIGH_VOLATILITY_OR_BURST -> requires change-aware`, `LOCALIZED_EDGE_NOISE -> use fixed`) directly into the prompt before calling `laya`.
+
+To test whether a System-1 decision model can genuinely select polling policies **from raw numerical telemetry alone**, we built a strictly unbiased protocol ([`run_fair_unbiased_experiments.py`](file:///Users/gab/Documents/UNI/KTH/Research%20Methodologies/run_fair_unbiased_experiments.py) / [`ndt_fair_unbiased_kaggle_experiments.ipynb`](file:///Users/gab/Documents/UNI/KTH/Research%20Methodologies/ndt_fair_unbiased_kaggle_experiments.ipynb)) enforcing:
+1. **Zero Prompt Spoon-Feeding:** `laya` receives only raw numerical statistics (`mean_abs_delta`, `max_abs_delta`, `p90_abs_delta`, `std_delta`, `core_mean_abs_delta`, `edge_max_abs_delta`, `links_with_delta_gt_3.5pct`, and raw per-link readings) with neutral, factual policy definitions.
+2. **Strict Information Parity:** Compared against both `rule_simple` (scalar threshold) and `rule_spatial` (deterministic rule using the exact same multi-link spatial features).
+3. **True Pareto Frontier Evaluation:** Every scenario plots the full static `fixed` curve (`5.0s → 2.5s → 1.0s`).
+
+### 7.2 Key Empirical Discovery (1,344 Live GPU Calls on Tesla T4, CUDA 13.0)
+Executed on Kaggle Tesla T4 (`convaiinnovations/laya`, revision `246177e5cb70334c9831c0730864a93c836aac8f`, `fallback_rate = 0.000` on 100% of regimes after warmup, **46–49 ms Mean RTT**, **50.7 ms P95 RTT**, flat $O(1)$ across 8, 16, 32, and 64 links):
+
+* **Complete Class Collapse on Raw Numbers (`change_aware_frac = 0.000`):**  
+  Across all **1,344 live GPU reviews** (Suite A: 8-link `stable`, `bursty`, `alternating`, `shifted` × 2 delays; Suite B: `8, 16, 32, 64` links × `homogeneous_alternating`, `localized_edge_noise`, `gradual_ramp_and_shift`, `periodic_oscillation_trap`), `laya_live_unbiased` returned valid JSON (`0.0%` fallback) **but selected `'fixed'` 100% of the time (`change_aware_frac = 0.000`)**, degenerating identically onto the static `fixed (2.5s)` baseline!
+* **Deterministic Rules Strictly Beat the Static Pareto Frontier:**  
+  Meanwhile, `rule_simple` and `rule_spatial` (at $0.05\text{ ms}$ latency and $0\text{ B}$ GPU VRAM) sat **strictly below and to the left of the static `fixed` frontier** across `bursty`, `alternating`, `shifted`, `homogeneous_alternating`, `localized_edge_noise`, and `periodic_oscillation_trap`:
+  * *8-link `alternating` (`low_delay`):* `rule_spatial` achieved **3.77% MAE at 22.5 KB** vs. `fixed_1.0s` (**3.91% MAE at 26.8 KB**) and `laya_live_unbiased` (**5.81% MAE at 10.8 KB**).
+  * *8-link `shifted` (`low_delay`):* `rule_simple` achieved **0.85% MAE at 9.0 KB** vs. `fixed_2.5s` / `laya_live_unbiased` (**0.89% MAE at 10.8 KB**).
+  * *64-link `localized_edge_noise`:* `rule_spatial` achieved **2.14% MAE at 176.4 KB** (strictly below `fixed_1.0s` at **2.23% MAE / 189.0 KB**), while `laya_live_unbiased` remained stuck at `fixed_2.5s` (**3.10% MAE / 76.2 KB**).
+
+### 7.3 Scientific Conclusion (The Controlled Ablation Contrast)
+Comparing the earlier semantically pre-labeled runs against the unbiased raw-number runs yields a decisive, generalizable scientific finding for II2202:
+1. **Semantic Matching vs. Numerical Reasoning:** Small zero-shot System-1 encoders like `laya` (421M ModernBERT) succeed when inputs are pre-discretized into semantic text categories (`HIGH_VOLATILITY_OR_BURST`), **but fail to perform numerical thresholding over raw floating-point telemetry**—directly validating TypeSafe's documented warning against relying on numerical precision (`\cite{limits}`).
+2. **Redundancy Under Pre-Discretization:** If deterministic code must already run an `if/else` to convert numeric telemetry into semantic labels for the model, that deterministic rule can directly select the polling policy in $0.05\text{ ms}$ with zero GPU memory and zero timeout risk.
+3. **Where Decision Models Actually Belong:** For purely numerical NDT synchronization, deterministic rules (`rule_simple`, `rule_spatial`) strictly dominate zero-shot decision models. Decision models would only add genuine value when synchronization policy depends on **unstructured semantic context** (e.g., operator maintenance logs, incident tickets, or natural-language SLA priorities) that cannot be reduced to numeric thresholds.
+
+*(Unbiased Pareto & latency figures saved in [`logs/fair_unbiased_laya/`](file:///Users/gab/Documents/UNI/KTH/Research%20Methodologies/logs/fair_unbiased_laya/): `fair_fig1_suiteA_pareto_8link.png`, `fair_fig2_suiteB_pareto_multinode.png`, and `fair_fig3_laya_behavior_and_latency.png`.)*
+
+---
+
+## 8. Narrative Takeaways for Final Report & Presentation
 
 1. **Report Phase 1 Transparently:**  
    Show that on the small, homogeneous 8-link topology, a 1-line deterministic rule (`rule_switcher`) already captures most of the benefit of switching (except in `alternating` traffic with elevated delay, where `laya` saves ~1.1 KB at equal error). This confirms the hypothesis stated in Research Plan §1.3: *"including cases where a simpler controller is sufficient."*
