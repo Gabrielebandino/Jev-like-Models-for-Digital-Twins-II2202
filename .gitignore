@@ -1,18 +1,11 @@
-# Python bytecode and caches
 __pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.ipynb_checkpoints/
+*.pyc
+*.pyo
 .DS_Store
-
-# Model weights, caches, and runtime server logs
+.ipynb_checkpoints/
+*.zip
 kev_repo/
-*.pt
-*.safetensors
-*.gguf
-*.bin
-unsloth_server.log
-logs/server_*.log
 clm_t4_server.py
-ndt_complete_experiment_logs.zip
+clm_v2_server.py
+traces/
+*.log
