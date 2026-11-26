@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unified Live GPU Model Servers & Clients for NDT v2 PhD Experiments (Kaggle T4 x2).
+"""Unified Live GPU Model Servers & Clients for NDT v2 Experiments (Kaggle T4 x2).
 
 Supports 3 distinct open-weight decision-model families in strict sequential isolation (zero VRAM contention):
   1. `laya`      : convaiinnovations/laya (421M ModernBERT-large System-1 Choice, fp16, ~48 ms)
@@ -426,7 +426,7 @@ class Qwen25LogitSelector:
 # ==============================================================================
 # SERVER LIFECYCLE HELPERS
 # ==============================================================================
-def start_http_model_server(model_key: str, log_dir: str = "logs/v2_phd") -> Tuple[subprocess.Popen, str, str]:
+def start_http_model_server(model_key: str, log_dir: str = "logs/v2") -> Tuple[subprocess.Popen, str, str]:
     """Start `laya` or `clm_8b` server cleanly on GPU 0 and verify `/health`."""
     os.makedirs(log_dir, exist_ok=True)
     kill_all_model_servers()

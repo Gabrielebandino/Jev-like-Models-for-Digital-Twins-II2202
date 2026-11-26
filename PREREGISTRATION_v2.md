@@ -4,7 +4,7 @@
 **Authors:** Gabriele Bandino (`bandino@kth.se`), Jago Revrenna (`revrenna@kth.se`)  
 **Mentor:** Nadia Bekkali (KTH Royal Institute of Technology)  
 **Compliance Base:** Approved Research Plan (`researchPlan5Nov/II2202-research-plan.tex`)  
-**Engine & Notebook:** `ndt_v2_engine.py`, `ndt_v2_models.py`, `ndt_phd_v2_kaggle_experiments.ipynb`
+**Engine & Notebook:** `ndt_v2_engine.py`, `ndt_v2_models.py`, `ndt_v2_kaggle_experiments.ipynb`
 
 ---
 

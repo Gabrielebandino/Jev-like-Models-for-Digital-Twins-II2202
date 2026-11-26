@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the self-contained PhD-Level v2 Kaggle T4 x2 Notebook (`ndt_phd_v2_kaggle_experiments.ipynb`).
+"""Generate the self-contained v2 Kaggle T4 x2 Notebook (`ndt_v2_kaggle_experiments.ipynb`).
 
 Embeds the locally verified `ndt_v2_engine.py` and `ndt_v2_models.py` directly into `%%writefile`
 cells so the notebook runs standalone on Kaggle GPU T4 x2 with zero external repo sync issues.
@@ -38,7 +38,7 @@ def build_v2_notebook() -> dict:
 
     cells = [
         md_cell(
-            r"""# 🔬 PhD-Level NDT Policy-Selection Research Suite (v2 — Kaggle GPU T4 x2)
+            r"""# 🔬 NDT Policy-Selection Research Suite (v2 — Kaggle GPU T4 x2)
 ### Decision-Model Applicability to Network Digital Twin Synchronization (KTH II2202)
 **Authors:** Gabriele Bandino (`bandino@kth.se`) & Jago Revrenna (`revrenna@kth.se`)  
 **Compliance Base:** Approved Research Plan (`researchPlan5Nov/II2202-research-plan.tex`) + `PREREGISTRATION_v2.md` + `DEVIATIONS.md`
@@ -78,11 +78,11 @@ print("✓ GPU Detected:", torch.cuda.get_device_name(0), f"({torch.cuda.device_
 
 # ==============================================================================
 # EXPERIMENT PROFILE (Switch to "QUICK_VERIFY" for a ~6-min dry run,
-#                     or keep "FULL_PHD" for the complete publication dataset!)
+#                     or keep "FULL" for the complete evaluation dataset!)
 # ==============================================================================
-RUN_PROFILE = "FULL_PHD"   # Options: "FULL_PHD" (~30-40 min on T4) or "QUICK_VERIFY" (~6 min on T4)
+RUN_PROFILE = "FULL"   # Options: "FULL" (~30-40 min on T4) or "QUICK_VERIFY" (~6 min on T4)
 
-if RUN_PROFILE == "FULL_PHD":
+if RUN_PROFILE == "FULL":
     CFG = {
         "pilot_seeds": [101, 102, 103, 104, 105],
         "heldout_primary_n": 50,          # Power-justified N=50 for baselines, oracle & primary fast model (laya)
@@ -113,7 +113,7 @@ else:
         "fetch_real_sndlib_tm": True,
     }
 
-OUT_DIR = "logs/v2_phd"
+OUT_DIR = "logs/v2"
 os.makedirs(OUT_DIR, exist_ok=True)
 with open(os.path.join(OUT_DIR, "run_profile_config.json"), "w") as f:
     json.dump({"profile": RUN_PROFILE, **CFG}, f, indent=2)
@@ -731,7 +731,7 @@ with open(os.path.join(OUT_DIR, "real_sndlib_status.json"), "w") as f:
 print("Real SNDlib TM Status:", json.dumps(real_tm_status, indent=2))"""
         ),
         md_cell(
-            """## 📈 11. Stage 7 — Full PhD Statistical Analysis (Iso-Bytes Pareto, Headroom, ROC-AUC, Wilcoxon+Holm & TOST)"""
+            """## 📈 11. Stage 7 — Full Statistical Analysis (Iso-Bytes Pareto, Headroom, ROC-AUC, Wilcoxon+Holm & TOST)"""
         ),
         code_cell(
             """# Merge all Held-Out results & review logs
@@ -1002,9 +1002,9 @@ plt.close(fig)
 for fp in (fig1_path, fig2_path, fig3_path, fig4_path, fig5_path, fig6_path):
     display(Image(filename=fp))
 
-zip_base = "/kaggle/working/ndt_phd_v2_complete_outputs" if os.path.exists("/kaggle/working") else "ndt_phd_v2_complete_outputs"
+zip_base = "/kaggle/working/ndt_v2_complete_outputs" if os.path.exists("/kaggle/working") else "ndt_v2_complete_outputs"
 zip_path = shutil.make_archive(zip_base, "zip", root_dir=".", base_dir=OUT_DIR)
-print(f"\\n🎉 ALL PhD v2 EXPERIMENTS & FIGURES COMPLETE! Download archive: {zip_path}")"""
+print(f"\\n🎉 ALL v2 EXPERIMENTS & FIGURES COMPLETE! Download archive: {zip_path}")"""
         ),
     ]
 
@@ -1029,7 +1029,7 @@ print(f"\\n🎉 ALL PhD v2 EXPERIMENTS & FIGURES COMPLETE! Download archive: {zi
 
 if __name__ == "__main__":
     nb = build_v2_notebook()
-    out_path = os.path.join(HERE, "ndt_phd_v2_kaggle_experiments.ipynb")
+    out_path = os.path.join(HERE, "ndt_v2_kaggle_experiments.ipynb")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(nb, f, indent=2, ensure_ascii=False)
     print(f"✓ Generated {out_path} ({len(nb['cells'])} cells)")

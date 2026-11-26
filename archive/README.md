@@ -1,6 +1,6 @@
 # Archive — Superseded v1 Methodological Audit Trail
 
-> **WARNING:** Nothing in `archive/` is primary evidence for the final II2202 study. All primary results come from the pre-registered v2 PhD-level suite (`ndt_phd_v2_kaggle_experiments.ipynb`, `ndt_v2_engine.py`, `logs/v2_phd/`).
+> **WARNING:** Nothing in `archive/` is primary evidence for the final II2202 study. All primary results come from the pre-registered v2 suite (`ndt_v2_kaggle_experiments.ipynb`, `ndt_v2_engine.py`, `logs/v2/`).
 
 ### Contents
 1. **`v1_spoonfed_audit/` (INVALIDATED AS PRIMARY EVIDENCE):**

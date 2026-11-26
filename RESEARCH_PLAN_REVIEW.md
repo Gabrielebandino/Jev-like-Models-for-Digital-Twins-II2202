@@ -8,7 +8,7 @@
 
 ## 0. Verdict in one paragraph
 
-The approved plan is sound and honest. The recovery plan diagnoses real problems correctly: prompt spoon-feeding, a weak baseline, orderless features and toy workloads. Its fixes are mostly **cosmetic**, though. Citing more RFCs and adding an 8B model will not make the study PhD-level. The real gap is that **the experiment currently has no way to tell whether a selector *could* help at all**. There is no oracle or headroom analysis. The change-aware arm is Pareto-dominated in some regimes. Most traces never change regime, so switching cannot matter by construction. And a null result cannot be distinguished from "no effect possible". The changes below fix that while staying inside the approved scope: a **headroom (oracle) analysis**, a **properly tuned change-aware arm**, **regime-switching traces**, **threshold-free diagnostics of the model's signal**, **equal tuning effort for every controller**, and **equivalence testing**. With these, a negative result becomes a strong, publishable finding rather than an inconclusive one.
+The approved plan is sound and honest. The recovery plan diagnoses real problems correctly: prompt spoon-feeding, a weak baseline, orderless features and toy workloads. Its fixes are mostly **cosmetic**, though. Citing more RFCs and adding an 8B model will not make the study rigorous. The real gap is that **the experiment currently has no way to tell whether a selector *could* help at all**. There is no oracle or headroom analysis. The change-aware arm is Pareto-dominated in some regimes. Most traces never change regime, so switching cannot matter by construction. And a null result cannot be distinguished from "no effect possible". The changes below fix that while staying inside the approved scope: a **headroom (oracle) analysis**, a **properly tuned change-aware arm**, **regime-switching traces**, **threshold-free diagnostics of the model's signal**, **equal tuning effort for every controller**, and **equivalence testing**. With these, a negative result becomes a strong, publishable finding rather than an inconclusive one.
 
 ---
 
@@ -114,7 +114,7 @@ The fixed frontier MAE(bytes) is convex. Linear interpolation between only 3–4
 - **RFC 8641 (YANG-Push periodic vs. on-change)** maps directly onto your two policies. Keep it.
 - **gNMI** (OpenConfig) is an even better fit. Its `STREAM` subscriptions offer `SAMPLE` (periodic), `ON_CHANGE` and **`TARGET_DEFINED`**, where the device picks the mode. Your study is essentially asking *"what should `TARGET_DEFINED` do, and can a model do it?"* That makes a strong motivation sentence.
 - **RFC 6298** is RTT estimation. Borrowing its α = 1/8, β = 1/4 for traffic volatility is arbitrary, and a reviewer will notice. Ground the strong baseline in **statistical change detection** instead: EWMA control charts (Roberts 1959; Lucas & Saccucci 1990) and **CUSUM / Page–Hinkley** (Page 1954). These are *the* canonical deterministic detectors. Tune their constants in the pilot.
-- Missing theory that makes this PhD-level: **sampling for remote estimation**. Sun, Polyanskiy & Uysal (IEEE T-IT 2020) prove that for a Wiener process over a random-delay channel, the MSE-optimal sampler is a **threshold policy on the estimation error**, which beats periodic and zero-wait sampling. This gives your change-aware arm a theoretical justification and predicts *when* adaptive beats periodic. Also cite Age of *Incorrect* Information (Maatouk et al., IEEE/ACM ToN 2020), which is closer to your MAE metric than AoI.
+- Missing theory that strengthens the framing: **sampling for remote estimation**. Sun, Polyanskiy & Uysal (IEEE T-IT 2020) prove that for a Wiener process over a random-delay channel, the MSE-optimal sampler is a **threshold policy on the estimation error**, which beats periodic and zero-wait sampling. This gives your change-aware arm a theoretical justification and predicts *when* adaptive beats periodic. Also cite Age of *Incorrect* Information (Maatouk et al., IEEE/ACM ToN 2020), which is closer to your MAE metric than AoI.
 
 ---
 
@@ -131,7 +131,7 @@ The fixed frontier MAE(bytes) is convex. Linear interpolation between only 3–4
 
 ---
 
-## 4. Proposed v2 design (PhD-level, still within the approved scope)
+## 4. Proposed v2 design (rigorous, still within the approved scope)
 
 ### 4.1 Refined hypotheses (pre-register them)
 - **H0 (headroom):** in regime-switching traces, the oracle switcher beats the best static policy by more than the SESOI. In homogeneous traces it does not.

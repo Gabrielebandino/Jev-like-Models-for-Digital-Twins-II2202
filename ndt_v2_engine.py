@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""NDT Synchronization v2 Engine — PhD-Level Trace-Driven Simulation, Oracle Headroom & Statistics.
+"""NDT Synchronization v2 Engine — Trace-Driven Simulation, Oracle Headroom & Statistics.
 
 Strictly compliant with the approved II2202 Research Plan (researchPlan5Nov/II2202-research-plan.tex)
 while implementing every methodological fix from RESEARCH_PLAN_REVIEW.md:
@@ -905,7 +905,7 @@ class SimpleRuleSelector:
 
 
 class EWMACusumHysteresisSelector:
-    """PhD-level deterministic baseline: EWMA control chart + CUSUM + oscillation/Gini guard + dwell hysteresis."""
+    """Advanced deterministic baseline: EWMA control chart + CUSUM + oscillation/Gini guard + dwell hysteresis."""
 
     def __init__(self, protocol: ProtocolV2):
         self.p = protocol
@@ -1262,7 +1262,7 @@ def simulate_trace(
       - "fixed": static fixed interval (`fixed_interval_override` or `protocol.fixed_interval_s`)
       - "change_aware": static rate-normalized Change-Aware
       - "rule_simple": approved plan simple threshold rule (change + AoI)
-      - "rule_ewma_cusum": PhD-level EWMA + CUSUM + oscillation/Gini + hysteresis rule
+      - "rule_ewma_cusum": EWMA + CUSUM + oscillation/Gini + hysteresis rule
       - "oracle": hindsight one-step counterfactual oracle switcher
       - "random": random switcher at `random_p_ca`
       - "learnability_ceiling": pilot-trained classifier diagnostic (NOT a competing controller)
