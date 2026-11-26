@@ -1,0 +1,24 @@
+{
+  "profile": "FULL_PHD",
+  "pilot_seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "heldout_primary_n": 50,
+  "heldout_raw_ablation_n": 15,
+  "heldout_secondary_8b_n": 15,
+  "heldout_control_n": 15,
+  "heldout_abilene_n": 20,
+  "heldout_abilene_7b_n": 10,
+  "pilot_screen_reviews": 100,
+  "repeat_stability_seeds": [
+    2001,
+    2002
+  ],
+  "run_clm_8b": true,
+  "run_qwen25_7b": true,
+  "fetch_real_sndlib_tm": true
+}

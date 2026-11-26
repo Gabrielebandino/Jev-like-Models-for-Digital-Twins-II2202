@@ -1,0 +1,15 @@
+{
+  "num_passed": 7,
+  "num_checks": 7,
+  "all_passed": true,
+  "details": {
+    "constant_state_zero_mae": true,
+    "out_of_order_rejected": true,
+    "deadline_timeout_fallback": true,
+    "zero_future_leakage": true,
+    "switch_no_extra_poll": true,
+    "oracle_tracks_exact_2R": true,
+    "abilene_ospf_failover_connected": true
+  },
+  "oracle_vs_2R_gap": 0.2313
+}

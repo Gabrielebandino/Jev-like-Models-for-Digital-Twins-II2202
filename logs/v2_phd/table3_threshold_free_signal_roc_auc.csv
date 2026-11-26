@@ -1,0 +1,14 @@
+controller,regime,n_reviews,oracle_ca_rate,ctrl_ca_rate,oracle_agreement,roc_auc_all,roc_auc_high_margin,avg_precision
+clm_8b_calibrated,regime_switching,1410,0.725,0.055,0.2993,0.6156,0.648,0.775
+laya_calibrated,abilene_regime_switching,940,0.501,0.0,0.4989,0.401,0.3787,0.4365
+laya_calibrated,regime_switching,1410,0.731,0.0,0.2688,0.3646,0.3881,0.657
+laya_raw,regime_switching,1410,0.731,0.0,0.2688,0.3646,0.3881,0.657
+learnability_ceiling,abilene_regime_switching,1410,0.499,0.788,0.5539,0.6792,0.7227,0.6961
+learnability_ceiling,regime_switching,1410,0.711,0.768,0.6624,0.6099,0.6488,0.7766
+qwen25_7b_fewshot,abilene_regime_switching,940,0.501,0.0,0.4989,0.5,0.5,0.5011
+qwen25_7b_fewshot,regime_switching,1410,0.731,0.0,0.2688,0.5,0.5,0.7312
+qwen25_7b_zeroshot,regime_switching,1410,0.736,0.34,0.3865,0.4323,0.3835,0.7067
+rule_ewma_cusum,abilene_regime_switching,1410,0.499,0.595,0.6199,0.5493,0.5898,0.5101
+rule_ewma_cusum,regime_switching,1410,0.715,0.735,0.7418,0.7046,0.7937,0.8034
+rule_simple,abilene_regime_switching,1410,0.522,0.602,0.5312,0.4716,0.5423,0.4666
+rule_simple,regime_switching,1410,0.734,0.584,0.6674,0.7187,0.799,0.8299

@@ -1,0 +1,403 @@
+{
+  "protocol": {
+    "trace_duration_s": 480.0,
+    "control_duration_s": 240.0,
+    "warmup_duration_s": 30.0,
+    "tick_dt_s": 0.1,
+    "review_period_s": 10.0,
+    "decision_deadline_ms": 2000.0,
+    "fixed_interval_s": 2.5,
+    "ca_min_interval_s": 0.8,
+    "ca_max_interval_s": 6.0,
+    "ca_init_interval_s": 2.5,
+    "ca_norm_exp": 0.5,
+    "ca_high_threshold": 9.5,
+    "ca_low_threshold": 2.8,
+    "ca_quiet_streak_required": 2,
+    "ca_shorten_factor": 0.5,
+    "ca_lengthen_factor": 1.5,
+    "ca_signal_mode": "max_weighted",
+    "lambda_kb_per_link": 0.4393,
+    "sesoi_cost": 0.1,
+    "simple_mean_rate_thresh": 1.2,
+    "simple_max_rate_thresh": 3.0,
+    "simple_max_age_safety_s": 4.5,
+    "simple_quiet_mean_thresh": 0.9,
+    "ewma_alpha_fast": 0.45,
+    "ewma_alpha_slow": 0.15,
+    "ewma_beta_dev": 0.25,
+    "ewma_k_sigma": 1.5,
+    "cusum_thresh": 4.0,
+    "osc_trap_thresh": 0.55,
+    "gini_flap_thresh": 0.42,
+    "active_frac_macro_min": 0.3,
+    "quiet_rate_thresh": 1.05,
+    "hysteresis_dwell_reviews": 1,
+    "congestion_threshold_pct": 75.0,
+    "selected_prompt_idx": 0,
+    "calibration_prior_p_ca": 0.5
+  },
+  "pilot_report": {
+    "lambda_kb_per_link": 0.4393,
+    "best_ca_cfg": [
+      0.8,
+      0.5,
+      9.5,
+      2.8,
+      2
+    ],
+    "best_ca_pilot_j": 6.0968,
+    "best_simple_rule_cfg": [
+      1.2,
+      3.0,
+      0.9,
+      4.5
+    ],
+    "best_simple_rule_pilot_j": 5.539,
+    "best_ewma_rule_cfg": [
+      0.42,
+      0.55,
+      0.3,
+      1.05,
+      1
+    ],
+    "best_ewma_rule_pilot_j": 5.542,
+    "pilot_mean_headroom_j": 0.6758,
+    "pilot_ewma_gain_over_best_static_j": 0.2588,
+    "pilot_paired_sd": 0.2852,
+    "power_n_superiority_80pct": 64,
+    "power_n_tost_equivalence_80pct": 51,
+    "recommended_heldout_n": 60,
+    "pilot_oracle_ca_rate": 0.6511,
+    "pilot_num_reviews": 470,
+    "few_shot_indices": {
+      "ca": [
+        316,
+        314
+      ],
+      "fixed": [
+        243,
+        208
+      ]
+    }
+  },
+  "primary_model_by_pilot_auc": "laya",
+  "pilot_model_screens": {
+    "laya": {
+      "model_key": "laya",
+      "best_paraphrase_idx": 0,
+      "best_paraphrase_name": "paraphrase_0_standard",
+      "selected_prior_p_ca": 0.7151,
+      "prior_method": "label_free_pilot_median",
+      "best_pilot_roc_auc": 0.6388,
+      "paraphrase_auc_spread": 0.0466,
+      "best_latency_p95_ms": 45.42,
+      "parse_valid_rate": 1.0,
+      "all_paraphrases": [
+        {
+          "model_key": "laya",
+          "paraphrase_idx": 0,
+          "paraphrase_name": "paraphrase_0_standard",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 44.29,
+          "latency_p95_ms": 45.42,
+          "content_free_p0_ca": 0.4191,
+          "pilot_median_p_ca": 0.7151,
+          "selected_prior_p_ca": 0.7151,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.6388,
+          "pilot_acc_raw": 0.59,
+          "pilot_acc_calibrated": 0.62,
+          "pilot_raw_ca_frac": 0.73
+        },
+        {
+          "model_key": "laya",
+          "paraphrase_idx": 1,
+          "paraphrase_name": "paraphrase_1_swapped_order",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 44.51,
+          "latency_p95_ms": 45.52,
+          "content_free_p0_ca": 0.3411,
+          "pilot_median_p_ca": 0.6532,
+          "selected_prior_p_ca": 0.6532,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.6216,
+          "pilot_acc_raw": 0.59,
+          "pilot_acc_calibrated": 0.62,
+          "pilot_raw_ca_frac": 0.73
+        },
+        {
+          "model_key": "laya",
+          "paraphrase_idx": 2,
+          "paraphrase_name": "paraphrase_2_gnmi_framing",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 44.55,
+          "latency_p95_ms": 45.66,
+          "content_free_p0_ca": 0.3961,
+          "pilot_median_p_ca": 0.8301,
+          "selected_prior_p_ca": 0.8301,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.5922,
+          "pilot_acc_raw": 0.59,
+          "pilot_acc_calibrated": 0.6,
+          "pilot_raw_ca_frac": 0.73
+        },
+        {
+          "model_key": "laya",
+          "paraphrase_idx": 3,
+          "paraphrase_name": "paraphrase_3_concise_technical",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 44.84,
+          "latency_p95_ms": 45.82,
+          "content_free_p0_ca": 0.4752,
+          "pilot_median_p_ca": 0.6278,
+          "selected_prior_p_ca": 0.6278,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.6148,
+          "pilot_acc_raw": 0.59,
+          "pilot_acc_calibrated": 0.6,
+          "pilot_raw_ca_frac": 0.73
+        }
+      ]
+    },
+    "clm_8b": {
+      "model_key": "clm_8b",
+      "best_paraphrase_idx": 3,
+      "best_paraphrase_name": "paraphrase_3_concise_technical",
+      "selected_prior_p_ca": 0.1324,
+      "prior_method": "label_free_pilot_median",
+      "best_pilot_roc_auc": 0.6068,
+      "paraphrase_auc_spread": 0.3496,
+      "best_latency_p95_ms": 962.56,
+      "parse_valid_rate": 1.0,
+      "all_paraphrases": [
+        {
+          "model_key": "clm_8b",
+          "paraphrase_idx": 0,
+          "paraphrase_name": "paraphrase_0_standard",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 726.81,
+          "latency_p95_ms": 810.81,
+          "content_free_p0_ca": 0.4338,
+          "pilot_median_p_ca": 0.7689,
+          "selected_prior_p_ca": 0.4338,
+          "prior_method": "zhao_content_free",
+          "pilot_roc_auc": 0.2572,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.5,
+          "pilot_raw_ca_frac": 1.0
+        },
+        {
+          "model_key": "clm_8b",
+          "paraphrase_idx": 1,
+          "paraphrase_name": "paraphrase_1_swapped_order",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 2.37,
+          "latency_p95_ms": 2.68,
+          "content_free_p0_ca": 0.4338,
+          "pilot_median_p_ca": 0.7689,
+          "selected_prior_p_ca": 0.4338,
+          "prior_method": "zhao_content_free",
+          "pilot_roc_auc": 0.2572,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.5,
+          "pilot_raw_ca_frac": 1.0
+        },
+        {
+          "model_key": "clm_8b",
+          "paraphrase_idx": 2,
+          "paraphrase_name": "paraphrase_2_gnmi_framing",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 776.24,
+          "latency_p95_ms": 971.68,
+          "content_free_p0_ca": 0.4437,
+          "pilot_median_p_ca": 0.9357,
+          "selected_prior_p_ca": 0.9357,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.4852,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.54,
+          "pilot_raw_ca_frac": 1.0
+        },
+        {
+          "model_key": "clm_8b",
+          "paraphrase_idx": 3,
+          "paraphrase_name": "paraphrase_3_concise_technical",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 783.47,
+          "latency_p95_ms": 962.56,
+          "content_free_p0_ca": 0.0743,
+          "pilot_median_p_ca": 0.1324,
+          "selected_prior_p_ca": 0.1324,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.6068,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.6,
+          "pilot_raw_ca_frac": 0.0
+        }
+      ]
+    },
+    "qwen25_7b_zeroshot": {
+      "model_key": "qwen25_7b_zeroshot",
+      "best_paraphrase_idx": 2,
+      "best_paraphrase_name": "paraphrase_2_gnmi_framing",
+      "selected_prior_p_ca": 0.848,
+      "prior_method": "label_free_pilot_median",
+      "best_pilot_roc_auc": 0.541,
+      "paraphrase_auc_spread": 0.161,
+      "best_latency_p95_ms": 933.38,
+      "parse_valid_rate": 1.0,
+      "all_paraphrases": [
+        {
+          "model_key": "qwen25_7b_zeroshot",
+          "paraphrase_idx": 0,
+          "paraphrase_name": "paraphrase_0_standard",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 935.78,
+          "latency_p95_ms": 1003.33,
+          "content_free_p0_ca": 0.9294,
+          "pilot_median_p_ca": 0.98,
+          "selected_prior_p_ca": 0.9294,
+          "prior_method": "zhao_content_free",
+          "pilot_roc_auc": 0.4088,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.45,
+          "pilot_raw_ca_frac": 1.0
+        },
+        {
+          "model_key": "qwen25_7b_zeroshot",
+          "paraphrase_idx": 1,
+          "paraphrase_name": "paraphrase_1_swapped_order",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 938.02,
+          "latency_p95_ms": 981.84,
+          "content_free_p0_ca": 1.0,
+          "pilot_median_p_ca": 0.98,
+          "selected_prior_p_ca": 1.0,
+          "prior_method": "zhao_content_free",
+          "pilot_roc_auc": 0.5338,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.52,
+          "pilot_raw_ca_frac": 1.0
+        },
+        {
+          "model_key": "qwen25_7b_zeroshot",
+          "paraphrase_idx": 2,
+          "paraphrase_name": "paraphrase_2_gnmi_framing",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 918.53,
+          "latency_p95_ms": 933.38,
+          "content_free_p0_ca": 0.2751,
+          "pilot_median_p_ca": 0.848,
+          "selected_prior_p_ca": 0.848,
+          "prior_method": "label_free_pilot_median",
+          "pilot_roc_auc": 0.541,
+          "pilot_acc_raw": 0.51,
+          "pilot_acc_calibrated": 0.51,
+          "pilot_raw_ca_frac": 0.93
+        },
+        {
+          "model_key": "qwen25_7b_zeroshot",
+          "paraphrase_idx": 3,
+          "paraphrase_name": "paraphrase_3_concise_technical",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 909.09,
+          "latency_p95_ms": 921.05,
+          "content_free_p0_ca": 0.5927,
+          "pilot_median_p_ca": 0.9504,
+          "selected_prior_p_ca": 0.5927,
+          "prior_method": "zhao_content_free",
+          "pilot_roc_auc": 0.38,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.5,
+          "pilot_raw_ca_frac": 1.0
+        }
+      ]
+    },
+    "qwen25_7b_fewshot": {
+      "model_key": "qwen25_7b_fewshot",
+      "best_paraphrase_idx": 2,
+      "best_paraphrase_name": "paraphrase_2_gnmi_framing",
+      "selected_prior_p_ca": 0.3914,
+      "prior_method": "zhao_content_free",
+      "best_pilot_roc_auc": 0.5,
+      "paraphrase_auc_spread": 0.0,
+      "best_latency_p95_ms": 2604.06,
+      "parse_valid_rate": 1.0,
+      "all_paraphrases": [
+        {
+          "model_key": "qwen25_7b_fewshot",
+          "paraphrase_idx": 0,
+          "paraphrase_name": "paraphrase_2_gnmi_framing",
+          "parse_valid_rate": 1.0,
+          "latency_p50_ms": 2584.74,
+          "latency_p95_ms": 2604.06,
+          "content_free_p0_ca": 0.3914,
+          "pilot_median_p_ca": 0.3914,
+          "selected_prior_p_ca": 0.3914,
+          "prior_method": "zhao_content_free",
+          "pilot_roc_auc": 0.5,
+          "pilot_acc_raw": 0.5,
+          "pilot_acc_calibrated": 0.5,
+          "pilot_raw_ca_frac": 0.0
+        }
+      ]
+    }
+  },
+  "gpu_vram_log": {
+    "laya": {
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "name": "Tesla T4",
+          "memory_used_mb": 1821.0,
+          "memory_total_mb": 15360.0,
+          "gpu_util_pct": 0.0
+        },
+        {
+          "gpu_index": 1,
+          "name": "Tesla T4",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 15360.0,
+          "gpu_util_pct": 0.0
+        }
+      ]
+    },
+    "clm_8b": {
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "name": "Tesla T4",
+          "memory_used_mb": 4899.0,
+          "memory_total_mb": 15360.0,
+          "gpu_util_pct": 0.0
+        },
+        {
+          "gpu_index": 1,
+          "name": "Tesla T4",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 15360.0,
+          "gpu_util_pct": 0.0
+        }
+      ]
+    },
+    "qwen25_7b": {
+      "gpus": [
+        {
+          "gpu_index": 0,
+          "name": "Tesla T4",
+          "memory_used_mb": 5583.0,
+          "memory_total_mb": 15360.0,
+          "gpu_util_pct": 0.0
+        },
+        {
+          "gpu_index": 1,
+          "name": "Tesla T4",
+          "memory_used_mb": 3.0,
+          "memory_total_mb": 15360.0,
+          "gpu_util_pct": 0.0
+        }
+      ]
+    }
+  }
+}

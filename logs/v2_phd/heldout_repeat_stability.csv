@@ -1,0 +1,13 @@
+topology,regime,delay,seed,controller,fixed_interval_s,mae_pct,rmse_pct,p95_err_pct,monitoring_kb,monitoring_bytes,cost_j,polls,rejected_ooo,mean_aoi_s,mean_det_delay_s,congestion_f1,reviews,switches,change_aware_frac,fallback_rate,skipped_backlog,latency_mean_ms,latency_p50_ms,latency_p95_ms,api_total_bytes,repeat_idx
+8link,regime_switching,low_delay,2001,laya_calibrated,,3.2117,7.4212,13.4294,28.456,28456,4.7743,193,0,1.3,1.513,0.6969,47,0,0.0,0.0,0,47.37,47.39,48.46,106887,0
+8link,regime_switching,low_delay,2001,laya_calibrated,,3.2117,7.4212,13.4294,28.456,28456,4.7743,193,0,1.3,1.513,0.6969,47,0,0.0,0.0,0,47.65,47.73,48.78,106887,1
+8link,regime_switching,low_delay,2001,laya_calibrated,,3.2117,7.4212,13.4294,28.456,28456,4.7743,193,0,1.3,1.513,0.6969,47,0,0.0,0.0,0,47.39,47.41,48.1,106887,2
+8link,regime_switching,low_delay,2002,laya_calibrated,,2.6239,7.2429,8.4922,28.456,28456,4.1865,193,0,1.323,1.4,0.7566,47,0,0.0,0.0,0,47.78,47.83,49.27,106824,0
+8link,regime_switching,low_delay,2002,laya_calibrated,,2.6239,7.2429,8.4922,28.456,28456,4.1865,193,0,1.323,1.4,0.7566,47,0,0.0,0.0,0,47.66,47.6,48.74,106824,1
+8link,regime_switching,low_delay,2002,laya_calibrated,,2.6239,7.2429,8.4922,28.456,28456,4.1865,193,0,1.323,1.4,0.7566,47,0,0.0,0.0,0,47.79,47.82,49.15,106824,2
+8link,regime_switching,low_delay,2001,qwen25_7b_fewshot,,3.2117,7.4212,13.4294,28.456,28456,4.7743,193,0,1.3,1.513,0.6969,47,0,0.0,1.0,0,2581.03,2579.91,2606.51,273632,0
+8link,regime_switching,low_delay,2001,qwen25_7b_fewshot,,3.2117,7.4212,13.4294,28.456,28456,4.7743,193,0,1.3,1.513,0.6969,47,0,0.0,1.0,0,2584.74,2581.19,2599.78,273632,1
+8link,regime_switching,low_delay,2001,qwen25_7b_fewshot,,3.2117,7.4212,13.4294,28.456,28456,4.7743,193,0,1.3,1.513,0.6969,47,0,0.0,1.0,0,2586.28,2587.05,2592.59,273632,2
+8link,regime_switching,low_delay,2002,qwen25_7b_fewshot,,2.6239,7.2429,8.4922,28.456,28456,4.1865,193,0,1.323,1.4,0.7566,47,0,0.0,1.0,0,2589.42,2589.69,2595.53,273554,0
+8link,regime_switching,low_delay,2002,qwen25_7b_fewshot,,2.6239,7.2429,8.4922,28.456,28456,4.1865,193,0,1.323,1.4,0.7566,47,0,0.0,1.0,0,2590.76,2590.51,2597.39,273554,1
+8link,regime_switching,low_delay,2002,qwen25_7b_fewshot,,2.6239,7.2429,8.4922,28.456,28456,4.1865,193,0,1.323,1.4,0.7566,47,0,0.0,1.0,0,2589.99,2589.89,2595.16,273554,2

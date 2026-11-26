@@ -1,0 +1,5 @@
+{
+  "attempted": true,
+  "success": false,
+  "note": "SNDlib fetch unavailable (NameError: name 'requests' is not defined); synthetic Abilene OSPF validation used."
+}
