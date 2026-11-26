@@ -1,7 +1,7 @@
 # II2202 Project Knowledge Base
 
-**Last updated:** 25 November 2026  
-**Status:** active working record; includes verified mentor approval, methodological audit of Nov 5–25 runs, and the Master's-level recovery plan (`RESEARCH_RECOVERY_PLAN.md`).
+**Last updated:** 26 November 2026  
+**Status:** active working record; v2 evaluation complete (`logs/v2/`, `PREREGISTRATION_v2.md`, `DEVIATIONS.md`), superseded v1 artifacts moved to `archive/`.
 
 ## What changed compared with the previous version
 
